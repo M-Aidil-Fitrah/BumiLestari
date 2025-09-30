@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { dummyProducts } from '../data/products';
 import type { Product } from '../data/products';
 import SearchBar from '../components/ui/SearchBar';
@@ -7,6 +8,7 @@ import ProductCardMarketplace from '../components/ui/ProductCardMarketplace';
 import Pagination from '../components/ui/Pagination';
 
 const MarketplacePage: React.FC = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState<FilterOptions>({
     category: 'Semua Kategori',
@@ -71,9 +73,7 @@ const MarketplacePage: React.FC = () => {
   }, [searchTerm, filters]);
 
   const handleProductClick = (product: Product) => {
-    // TODO: Navigate to product detail page
-    console.log('Product clicked:', product);
-    alert(`Navigasi ke detail produk: ${product.name}`);
+    navigate(`/marketplace/product/${product.id}`);
   };
 
   return (
