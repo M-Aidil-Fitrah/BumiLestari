@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { useProducts } from '../../hooks/useProducts';
-import { ProductCard } from '../ui/ProductCard';
+import { useNavigate } from 'react-router-dom';
+import { dummyProducts } from '../../data/products';
+import type { Product } from '../../data/products';
+import ProductCardMarketplace from '../ui/ProductCardMarketplace';
 import { withScrollAnimation } from '../../hoc/withScrollAnimation';
 import { withAnalytics } from '../../hoc/withAnalytics';
 
@@ -8,61 +10,41 @@ interface ProductSectionProps {
   title?: string;
   showAll?: boolean;
   maxProducts?: number;
-  categoryFilter?: 'all' | 'totebag' | 'bottle' | 'soap' | 'other';
+  categoryFilter?: string;
 }
 
 const ProductSectionBase = ({
   title = "Produk Pilihan",
   showAll = false,
   maxProducts = 8,
-  categoryFilter = 'all'
+  categoryFilter = 'Semua Kategori'
 }: ProductSectionProps) => {
-  const { products, loading, error, getProductsByCategory, getFeaturedProducts } = useProducts();
+  const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState<string>(categoryFilter);
 
-  const handleAddToCart = (productId: string) => {
-    console.log('Add to cart:', productId);
-    // Implement cart logic here
-  };
-
-  const handleViewDetails = (productId: string) => {
-    console.log('View details:', productId);
-    // Implement product detail navigation here
+  const handleProductClick = (product: Product) => {
+    navigate(`/product/${product.id}`);
   };
 
   const getFilteredProducts = () => {
-    let filteredProducts = products;
+    let filteredProducts = dummyProducts;
 
-    if (!showAll) {
-      filteredProducts = getFeaturedProducts();
-    }
-
-    if (activeCategory !== 'all') {
-      filteredProducts = getProductsByCategory(activeCategory as any);
+    if (activeCategory !== 'Semua Kategori') {
+      filteredProducts = dummyProducts.filter(product => product.category === activeCategory);
     }
 
     return filteredProducts.slice(0, maxProducts);
   };
 
-  const categories = [
-    { id: 'all', label: 'Semua Produk', icon: '🌍' },
-    { id: 'totebag', label: 'Tote Bag', icon: '👜' },
-    { id: 'bottle', label: 'Botol Minum', icon: '🍶' },
-    { id: 'soap', label: 'Sabun Organik', icon: '🧼' },
-    { id: 'other', label: 'Lainnya', icon: '♻️' }
+  // Create category buttons from marketplace categories
+  const categoryButtons = [
+    { id: 'Semua Kategori', label: 'Semua Produk', icon: '🌍' },
+    { id: 'Tas Ramah Lingkungan', label: 'Tas Eco-Friendly', icon: '👜' },
+    { id: 'Botol Ramah Lingkungan', label: 'Botol Minum', icon: '🍶' },
+    { id: 'Pembersih Organik', label: 'Pembersih Organik', icon: '🧼' },
+    { id: 'Personal Care Ramah Lingkungan', label: 'Personal Care', icon: '🧴' },
+    { id: 'Peralatan Makan Ramah Lingkungan', label: 'Peralatan Makan', icon: '🍽️' }
   ];
-
-  if (error) {
-    return (
-      <section id="products" className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="text-red-500 text-lg">
-            Gagal memuat produk: {error}
-          </div>
-        </div>
-      </section>
-    );
-  }
 
   return (
     <section id="products" className="py-16 bg-gray-50">
@@ -79,7 +61,7 @@ const ProductSectionBase = ({
 
         {/* Category Filter */}
         <div className="flex flex-wrap justify-center gap-3 mb-8">
-          {categories.map((category) => (
+          {categoryButtons.map((category) => (
             <button
               key={category.id}
               onClick={() => setActiveCategory(category.id)}
@@ -95,38 +77,19 @@ const ProductSectionBase = ({
           ))}
         </div>
 
-        {/* Loading State */}
-        {loading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[...Array(8)].map((_, index) => (
-              <div key={index} className="bg-white rounded-xl shadow-lg overflow-hidden animate-pulse">
-                <div className="h-48 bg-gray-200"></div>
-                <div className="p-4">
-                  <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded mb-4 w-2/3"></div>
-                  <div className="h-8 bg-gray-200 rounded"></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
         {/* Products Grid */}
-        {!loading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {getFilteredProducts().map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onAddToCart={handleAddToCart}
-                onViewDetails={handleViewDetails}
-              />
-            ))}
-          </div>
-        )}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {getFilteredProducts().map((product) => (
+            <ProductCardMarketplace
+              key={product.id}
+              product={product}
+              onClick={handleProductClick}
+            />
+          ))}
+        </div>
 
         {/* Empty State */}
-        {!loading && getFilteredProducts().length === 0 && (
+        {getFilteredProducts().length === 0 && (
           <div className="text-center py-12">
             <div className="text-6xl mb-4">🔍</div>
             <h3 className="text-xl font-semibold text-gray-600 mb-2">
@@ -141,7 +104,10 @@ const ProductSectionBase = ({
         {/* View All Button */}
         {!showAll && getFilteredProducts().length >= maxProducts && (
           <div className="text-center mt-12">
-            <button className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105">
+            <button 
+              onClick={() => navigate('/marketplace')}
+              className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105"
+            >
               Lihat Semua Produk
             </button>
           </div>
