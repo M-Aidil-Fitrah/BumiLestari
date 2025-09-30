@@ -1,4 +1,6 @@
+import { motion } from 'framer-motion';
 import type { Product } from '../../hooks/useProducts';
+import { cardHoverVariants, buttonVariants } from '../../animations/variants';
 
 interface ProductCardProps {
   product: Product;
@@ -16,13 +18,23 @@ export const ProductCard = ({ product, onAddToCart, onViewDetails }: ProductCard
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+    <motion.div 
+      className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer"
+      variants={cardHoverVariants}
+      initial="rest"
+      whileHover="hover"
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      layout
+    >
       {/* Product Image */}
       <div className="relative h-48 bg-gray-100 overflow-hidden">
-        <img
+        <motion.img
           src={product.image}
           alt={product.name}
-          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+          className="w-full h-full object-cover"
+          whileHover={{ scale: 1.1 }}
+          transition={{ duration: 0.3 }}
         />
         {product.originalPrice && (
           <div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded-lg text-sm font-medium">
@@ -99,25 +111,33 @@ export const ProductCard = ({ product, onAddToCart, onViewDetails }: ProductCard
 
         {/* Actions */}
         <div className="flex gap-2">
-          <button
+          <motion.button
             onClick={handleViewDetails}
-            className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+            className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-lg"
+            variants={buttonVariants}
+            initial="rest"
+            whileHover="hover"
+            whileTap="tap"
           >
             Detail
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             onClick={handleAddToCart}
             disabled={!product.inStock}
-            className={`flex-1 font-medium py-2 px-4 rounded-lg transition-colors duration-200 ${
+            className={`flex-1 font-medium py-2 px-4 rounded-lg ${
               product.inStock
                 ? 'bg-green-600 hover:bg-green-700 text-white'
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
+            variants={product.inStock ? buttonVariants : {}}
+            initial="rest"
+            whileHover={product.inStock ? "hover" : undefined}
+            whileTap={product.inStock ? "tap" : undefined}
           >
             {product.inStock ? 'Tambah ke Keranjang' : 'Stok Habis'}
-          </button>
+          </motion.button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
