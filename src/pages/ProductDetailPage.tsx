@@ -44,9 +44,13 @@ const ProductDetailPage: React.FC = () => {
   };
 
   const handleBuyNow = (product: Product, quantity: number) => {
-    // TODO: Navigate to checkout page
-    console.log('Buy now:', product, quantity);
-    alert(`Melanjutkan ke pembayaran untuk ${quantity} ${product.name}`);
+    // Navigate to payment page with product data
+    navigate('/payment', {
+      state: {
+        productId: product.id,
+        quantity: quantity
+      }
+    });
   };
 
   const handleBackToMarketplace = () => {
