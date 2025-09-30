@@ -27,7 +27,7 @@ dist-ssr
 
 
 # Pages directory
-pages/
+# pages/
 
 src/components/container/*
 !src/components/container/ProductSection*
