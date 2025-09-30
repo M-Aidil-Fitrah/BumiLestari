@@ -24,11 +24,12 @@ dist-ssr
 *.sw?
 
 # Pages directory
+.gitignore
 pages/
 
 src/components/container/*
-!src/components/container/TestimonialSection*
+!src/components/container/ProductSection*
 
 # components - ignore all except testimonial
 src/components/ui/*
-!src/components/ui/Testimonial*
+!src/components/ui/ProductCard*
