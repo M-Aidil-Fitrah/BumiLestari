@@ -17,7 +17,6 @@ const ProductSectionBase = ({
   title = "Produk Pilihan",
   showAll = false,
   maxProducts = 8,
-  categoryFilter = 'Semua Kategori'
 }: ProductSectionProps) => {
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState<string>('Semua Kategori');
