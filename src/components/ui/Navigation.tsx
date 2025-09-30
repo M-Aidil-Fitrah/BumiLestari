@@ -1,3 +1,4 @@
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useScrollToSection } from '../../hooks/useScrollAnimation';
 
 interface NavigationProps {
@@ -6,14 +7,34 @@ interface NavigationProps {
 
 export const Navigation = ({ isScrolled = false }: NavigationProps) => {
   const { scrollToSection } = useScrollToSection();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const navItems = [
-    { label: 'Beranda', href: 'hero' },
-    { label: 'Produk', href: 'products' },
-    { label: 'Tentang', href: 'about' },
-    { label: 'Testimoni', href: 'testimonials' },
-    { label: 'Kontak', href: 'contact' }
+    { label: 'Beranda', href: 'hero', type: 'scroll' },
+    { label: 'Produk', href: 'products', type: 'scroll' },
+    { label: 'Marketplace', href: '/marketplace', type: 'route' },
+    { label: 'Tentang', href: 'about', type: 'scroll' },
+    { label: 'Testimoni', href: 'testimonials', type: 'scroll' },
+    { label: 'Kontak', href: 'contact', type: 'scroll' }
   ];
+
+  const handleNavClick = (item: typeof navItems[0]) => {
+    if (item.type === 'route') {
+      navigate(item.href);
+    } else {
+      // If we're not on the home page, go to home first
+      if (location.pathname !== '/') {
+        navigate('/');
+        // Wait a bit for the page to load, then scroll
+        setTimeout(() => {
+          scrollToSection(item.href);
+        }, 100);
+      } else {
+        scrollToSection(item.href);
+      }
+    }
+  };
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -24,7 +45,7 @@ export const Navigation = ({ isScrolled = false }: NavigationProps) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => scrollToSection('hero')}>
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
             <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white text-lg">
               🌱
             </div>
@@ -40,9 +61,11 @@ export const Navigation = ({ isScrolled = false }: NavigationProps) => {
             {navItems.map((item) => (
               <button
                 key={item.href}
-                onClick={() => scrollToSection(item.href)}
+                onClick={() => handleNavClick(item)}
                 className={`font-medium transition-colors duration-200 hover:text-green-600 ${
                   isScrolled ? 'text-gray-700' : 'text-white hover:text-green-300'
+                } ${
+                  item.type === 'route' && location.pathname === item.href ? 'text-green-600' : ''
                 }`}
               >
                 {item.label}
@@ -52,12 +75,15 @@ export const Navigation = ({ isScrolled = false }: NavigationProps) => {
 
           {/* CTA Button */}
           <div className="hidden md:flex items-center gap-4">
-            <button className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-              isScrolled
-                ? 'bg-green-600 text-white hover:bg-green-700'
-                : 'bg-white text-green-600 hover:bg-green-50'
-            }`}>
-              Masuk
+            <button 
+              onClick={() => navigate('/marketplace')}
+              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                isScrolled
+                  ? 'bg-green-600 text-white hover:bg-green-700'
+                  : 'bg-white text-green-600 hover:bg-green-50'
+              }`}
+            >
+              Belanja Sekarang
             </button>
           </div>
 
