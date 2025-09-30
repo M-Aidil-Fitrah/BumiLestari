@@ -20,7 +20,7 @@ const ProductSectionBase = ({
   categoryFilter = 'Semua Kategori'
 }: ProductSectionProps) => {
   const navigate = useNavigate();
-  const [activeCategory, setActiveCategory] = useState<string>(categoryFilter);
+  const [activeCategory, setActiveCategory] = useState<string>('Semua Kategori');
 
   const handleProductClick = (product: Product) => {
     navigate(`/product/${product.id}`);
