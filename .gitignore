@@ -1,3 +1,5 @@
+.gitignore
+
 # Logs
 logs
 *.log
@@ -22,3 +24,15 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
+# # Pages directory
+# .gitignore
+# pages/
+
+# src/components/container/*
+# !src/components/container/ProductSection*
+
+# # components - ignore all except testimonial
+# src/components/ui/*
+# !src/components/ui/ProductCard*
