@@ -29,9 +29,9 @@ dist-ssr
 # Pages directory
 # pages/
 
-src/components/container/*
-!src/components/container/ProductSection*
+# src/components/container/*
+# !src/components/container/ProductSection*
 
-# components - ignore all except testimonial
-src/components/ui/*
-!src/components/ui/SearchBar*
+# # components - ignore all except testimonial
+# src/components/ui/*
+# !src/components/ui/Pagination*
