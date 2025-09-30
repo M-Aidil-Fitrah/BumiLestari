@@ -26,11 +26,11 @@ dist-ssr
 
 # Pages directory
 .gitignore
-pages/
+# pages/
 
 src/components/container/*
-# !src/components/container/ProductSection*
+!src/components/container/ProductSection*
 
 # components - ignore all except testimonial
 src/components/ui/*
-# !src/components/ui/ProductCard*
+!src/components/ui/ProductCard*
