@@ -34,4 +34,4 @@ src/components/container/*
 
 # components - ignore all except testimonial
 src/components/ui/*
-!src/components/ui/Filter*
+!src/components/ui/SearchBar*
