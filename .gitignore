@@ -22,3 +22,13 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Pages directory
+pages/
+
+src/components/container/*
+!src/components/container/TestimonialSection*
+
+# components - ignore all except testimonial
+src/components/ui/*
+!src/components/ui/Testimonial*
