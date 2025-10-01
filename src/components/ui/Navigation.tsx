@@ -10,6 +10,7 @@ export const Navigation = ({ isScrolled = false }: NavigationProps) => {
   const location = useLocation();
 
   const navItems = [
+    { label: 'Home', href: '/', type: 'route' },
     { label: 'Marketplace', href: '/marketplace', type: 'route' }
   ];
 
