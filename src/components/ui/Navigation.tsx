@@ -6,34 +6,15 @@ interface NavigationProps {
 }
 
 export const Navigation = ({ isScrolled = false }: NavigationProps) => {
-  const { scrollToSection } = useScrollToSection();
   const navigate = useNavigate();
   const location = useLocation();
 
   const navItems = [
-    { label: 'Beranda', href: 'hero', type: 'scroll' },
-    { label: 'Produk', href: 'products', type: 'scroll' },
-    { label: 'Marketplace', href: '/marketplace', type: 'route' },
-    { label: 'Tentang', href: 'about', type: 'scroll' },
-    { label: 'Testimoni', href: 'testimonials', type: 'scroll' },
-    { label: 'Kontak', href: 'contact', type: 'scroll' }
+    { label: 'Marketplace', href: '/marketplace', type: 'route' }
   ];
 
   const handleNavClick = (item: typeof navItems[0]) => {
-    if (item.type === 'route') {
-      navigate(item.href);
-    } else {
-      // If we're not on the home page, go to home first
-      if (location.pathname !== '/') {
-        navigate('/');
-        // Wait a bit for the page to load, then scroll
-        setTimeout(() => {
-          scrollToSection(item.href);
-        }, 100);
-      } else {
-        scrollToSection(item.href);
-      }
-    }
+    navigate(item.href);
   };
 
   return (
@@ -73,27 +54,27 @@ export const Navigation = ({ isScrolled = false }: NavigationProps) => {
             ))}
           </div>
 
-          {/* CTA Button */}
-          <div className="hidden md:flex items-center gap-4">
+          {/* Auth Buttons */}
+          <div className="hidden md:flex items-center gap-3">
             <button 
               onClick={() => navigate('/login')}
               className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                 isScrolled
-                  ? 'text-gray-700 hover:text-green-600'
-                  : 'text-white hover:text-green-300'
+                  ? 'text-gray-700 hover:text-green-600 hover:bg-green-50'
+                  : 'text-white hover:text-green-300 hover:bg-white/10'
               }`}
             >
-              Masuk
+              Login
             </button>
             <button 
-              onClick={() => navigate('/marketplace')}
+              onClick={() => navigate('/register')}
               className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                 isScrolled
                   ? 'bg-green-600 text-white hover:bg-green-700'
                   : 'bg-white text-green-600 hover:bg-green-50'
               }`}
             >
-              Belanja Sekarang
+              Register
             </button>
           </div>
 
