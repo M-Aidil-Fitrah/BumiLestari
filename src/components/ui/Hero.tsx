@@ -34,7 +34,7 @@ export const Hero = ({
 
   return (
     <motion.section 
-      className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-blue-50 to-emerald-50 overflow-hidden"
+      className="relative pt-20 min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-blue-50 to-emerald-50 overflow-hidden"
       initial="hidden"
       animate="visible"
       variants={staggerChildrenVariants}
