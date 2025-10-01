@@ -76,6 +76,16 @@ export const Navigation = ({ isScrolled = false }: NavigationProps) => {
           {/* CTA Button */}
           <div className="hidden md:flex items-center gap-4">
             <button 
+              onClick={() => navigate('/login')}
+              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                isScrolled
+                  ? 'text-gray-700 hover:text-green-600'
+                  : 'text-white hover:text-green-300'
+              }`}
+            >
+              Masuk
+            </button>
+            <button 
               onClick={() => navigate('/marketplace')}
               className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                 isScrolled
