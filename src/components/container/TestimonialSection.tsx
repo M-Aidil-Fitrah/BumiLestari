@@ -1,6 +1,7 @@
 import { TestimonialsGrid } from '../ui/Testimonial';
 import { withScrollAnimation } from '../../hoc/withScrollAnimation';
 import { withAnalytics } from '../../hoc/withAnalytics';
+import { useNavigate } from 'react-router-dom';
 
 interface TestimonialSectionProps {
   title?: string;
@@ -56,6 +57,8 @@ const TestimonialSectionBase = ({
     }
   ];
 
+  const navigate = useNavigate();
+
   return (
     <section id="testimonials" className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -81,7 +84,7 @@ const TestimonialSectionBase = ({
             <p className="text-gray-600 mb-6">
               Mulai perjalanan hidup berkelanjutan Anda bersama produk-produk ramah lingkungan terbaik
             </p>
-            <button className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105">
+            <button onClick={() => navigate('/marketplace')} className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105">
               Mulai Berbelanja Sekarang
             </button>
           </div>
