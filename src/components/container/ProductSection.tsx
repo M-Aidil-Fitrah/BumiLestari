@@ -22,7 +22,7 @@ const ProductSectionBase = ({
   const [activeCategory, setActiveCategory] = useState<string>('Semua Kategori');
 
   const handleProductClick = (product: Product) => {
-    navigate(`/product/${product.id}`);
+    navigate(`/marketplace/product/${product.id}`);
   };
 
   const getFilteredProducts = () => {
