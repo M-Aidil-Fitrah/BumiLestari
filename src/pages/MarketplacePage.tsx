@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { dummyProducts } from '../data/products';
 import type { Product } from '../data/products';
@@ -6,6 +6,7 @@ import SearchBar from '../components/ui/SearchBar';
 import Filter, { type FilterOptions } from '../components/ui/Filter';
 import ProductCardMarketplace from '../components/ui/ProductCardMarketplace';
 import Pagination from '../components/ui/Pagination';
+import { Navigation, Footer } from '../components/ui/Navigation';
 
 const MarketplacePage: React.FC = () => {
   const navigate = useNavigate();
@@ -76,21 +77,17 @@ const MarketplacePage: React.FC = () => {
     navigate(`/marketplace/product/${product.id}`);
   };
 
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Marketplace Produk Ramah Lingkungan
-            </h1>
-            <p className="text-gray-600">
-              Temukan berbagai produk berkebun dan ramah lingkungan untuk kebutuhan Anda
-            </p>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gray-50 pt-20">
+      <Navigation isScrolled={isScrolled} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
@@ -193,8 +190,11 @@ const MarketplacePage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
+
 };
 
 export default MarketplacePage;
