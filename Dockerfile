@@ -1,5 +1,5 @@
-# Gunakan Node.js versi 18 berbasis Alpine
-FROM node:18-alpine
+# Gunakan Node.js versi 20 berbasis Alpine
+FROM node:20-alpine
 
 # Menetapkan direktori kerja di dalam kontainer.
 WORKDIR /app
