@@ -18,4 +18,4 @@ COPY . .
 EXPOSE 5173
 
 # Perintah untuk menjalankan aplikasi saat kontainer dijalankan.
-CMD ["npm", "run", "dev", "--", "--host"]
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
