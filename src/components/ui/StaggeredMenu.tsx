@@ -362,7 +362,12 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     if (!closeOnClickAway || !open) return;
 
     const handleClickOutside = (event: MouseEvent) => {
-      if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
+      if (
+        panelRef.current && 
+        !panelRef.current.contains(event.target as Node) &&
+        toggleBtnRef.current &&
+        !toggleBtnRef.current.contains(event.target as Node)
+      ) {
         closeMenu();
       }
     };
@@ -377,15 +382,24 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     <div
       className={`sm-scope z-40 ${isFixed ? 'fixed top-0 left-0 w-screen h-screen overflow-hidden pointer-events-none' : 'w-full h-full'}`}
     >
+      {/* Backdrop/Overlay ketika menu terbuka */}
+      {open && (
+        <div
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[8] pointer-events-auto"
+          onClick={closeMenu}
+          aria-hidden="true"
+        />
+      )}
+
       <div
-        className={(className ? className + ' ' : '') + 'staggered-menu-wrapper relative w-full h-full z-40 pointer-events-none'}
+        className={(className ? className + ' ' : '') + `staggered-menu-wrapper relative w-full h-full z-40 ${open ? 'pointer-events-auto' : 'pointer-events-none'}`}
         style={accentColor ? ({ ['--sm-accent' as any]: accentColor } as React.CSSProperties) : undefined}
         data-position={position}
         data-open={open || undefined}
       >
         <div
           ref={preLayersRef}
-          className="sm-prelayers absolute top-0 right-0 bottom-0 pointer-events-none z-[5]"
+          className={`sm-prelayers absolute top-0 right-0 bottom-0 z-[5] ${open ? 'pointer-events-auto' : 'pointer-events-none'}`}
           aria-hidden="true"
         >
           {(() => {
@@ -465,7 +479,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
         <aside
           id="staggered-menu-panel"
           ref={panelRef}
-          className="staggered-menu-panel absolute top-0 right-0 h-full bg-white flex flex-col p-[6em_2em_2em_2em] overflow-y-auto z-10 backdrop-blur-[12px]"
+          className={`staggered-menu-panel absolute top-0 right-0 h-full bg-white flex flex-col p-[6em_2em_2em_2em] overflow-y-auto z-10 backdrop-blur-[12px] ${open ? 'pointer-events-auto' : 'pointer-events-none'}`}
           style={{ WebkitBackdropFilter: 'blur(12px)' }}
           aria-hidden={!open}
         >
@@ -543,9 +557,9 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 .sm-scope .sm-panel-itemWrap { position: relative; overflow: hidden; line-height: 1; }
 .sm-scope .sm-icon-line { position: absolute; left: 50%; top: 50%; width: 100%; height: 2px; background: currentColor; border-radius: 2px; transform: translate(-50%, -50%); will-change: transform; }
 .sm-scope .sm-line { display: none !important; }
-.sm-scope .staggered-menu-panel { position: absolute; top: 0; right: 0; width: clamp(300px, 42vw, 480px); height: 100%; background: white; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); display: flex; flex-direction: column; padding: 6em 2em 2em 2em; overflow-y: auto; z-index: 10; }
+.sm-scope .staggered-menu-panel { position: absolute; top: 0; right: 0; width: clamp(300px, 42vw, 480px); height: 100%; background: white; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); display: flex; flex-direction: column; padding: 6em 2em 2em 2em; overflow-y: auto; z-index: 10; pointer-events: auto; }
 .sm-scope [data-position='left'] .staggered-menu-panel { right: auto; left: 0; }
-.sm-scope .sm-prelayers { position: absolute; top: 0; right: 0; bottom: 0; width: clamp(300px, 42vw, 480px); pointer-events: none; z-index: 5; }
+.sm-scope .sm-prelayers { position: absolute; top: 0; right: 0; bottom: 0; width: clamp(300px, 42vw, 480px); pointer-events: auto; z-index: 9; }
 .sm-scope [data-position='left'] .sm-prelayers { right: auto; left: 0; }
 .sm-scope .sm-prelayer { position: absolute; top: 0; right: 0; height: 100%; width: 100%; transform: translateX(0); }
 .sm-scope .sm-panel-inner { flex: 1; display: flex; flex-direction: column; gap: 1.25rem; }
@@ -562,7 +576,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 .sm-scope .sm-socials-link:hover { color: var(--sm-accent, #ff0000); }
 .sm-scope .sm-panel-title { margin: 0; font-size: 1rem; font-weight: 600; color: #fff; text-transform: uppercase; }
 .sm-scope .sm-panel-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
-.sm-scope .sm-panel-item { position: relative; color: #000; font-weight: 600; font-size: 4rem; cursor: pointer; line-height: 1; letter-spacing: -2px; text-transform: uppercase; transition: background 0.25s, color 0.25s; display: inline-block; text-decoration: none; padding-right: 1.4em; }
+.sm-scope .sm-panel-item { position: relative; color: #000; font-weight: 600; font-size: 4rem; cursor: pointer; line-height: 1; letter-spacing: -2px; text-transform: uppercase; transition: background 0.25s, color 0.25s; display: inline-block; text-decoration: none; padding-right: 1.4em; pointer-events: auto; }
 .sm-scope .sm-panel-itemLabel { display: inline-block; will-change: transform; transform-origin: 50% 100%; }
 .sm-scope .sm-panel-item:hover { color: var(--sm-accent, #ff0000); }
 .sm-scope .sm-panel-list[data-numbering] { counter-reset: smItem; }
