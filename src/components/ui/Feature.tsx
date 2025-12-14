@@ -8,7 +8,7 @@ interface FeatureProps {
 export const Feature = ({ icon, title, description, className = "" }: FeatureProps) => {
   return (
     <div className={`text-center p-6 ${className}`}>
-      <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center text-3xl">
+      <div className="w-16 h-16 mx-auto mb-4 bg-[#8B7355]/10 rounded-full flex items-center justify-center text-3xl">
         {icon}
       </div>
       <h3 className="text-xl font-semibold text-gray-800 mb-3">{title}</h3>

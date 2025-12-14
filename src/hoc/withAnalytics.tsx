@@ -43,7 +43,7 @@ export const withAnalytics = <P extends object>(
 // Simple analytics tracking function
 const trackEvent = (event: AnalyticsEvent) => {
   // In production, this would send to analytics service
-  console.log('📊 Analytics Event:', event);
+  console.log('Analytics Event:', event);
   
   // Store in localStorage for demo purposes
   try {

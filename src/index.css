@@ -68,13 +68,13 @@ html {
 
 /* Custom gradient backgrounds */
 .bg-gradient-eco {
-  background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+  background: linear-gradient(135deg, #8B7355 0%, #6d5942 50%, #5a4a37 100%);
 }
 
 /* Focus styles for accessibility */
 button:focus,
 input:focus {
-  outline: 2px solid #10b981;
+  outline: 2px solid #8B7355;
   outline-offset: 2px;
 }
 

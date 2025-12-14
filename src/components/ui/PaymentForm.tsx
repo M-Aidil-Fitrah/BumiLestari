@@ -146,7 +146,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               id="name"
               value={customerData.name}
               onChange={(e) => handleInputChange('name', e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-colors ${
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] outline-none transition-colors ${
                 errors.name ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Masukkan nama lengkap"
@@ -163,7 +163,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               id="phone"
               value={customerData.phone}
               onChange={(e) => handleInputChange('phone', e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-colors ${
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] outline-none transition-colors ${
                 errors.phone ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="08xxxxxxxxxx"
@@ -181,7 +181,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             id="email"
             value={customerData.email}
             onChange={(e) => handleInputChange('email', e.target.value)}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-colors ${
+            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] outline-none transition-colors ${
               errors.email ? 'border-red-500' : 'border-gray-300'
             }`}
             placeholder="email@example.com"
@@ -203,7 +203,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                 rows={3}
                 value={customerData.address.street}
                 onChange={(e) => handleInputChange('address.street', e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-colors resize-none ${
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] outline-none transition-colors resize-none ${
                   errors.street ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="Jalan, Gang, Blok, Nomor Rumah, RT/RW"
@@ -221,7 +221,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                   id="city"
                   value={customerData.address.city}
                   onChange={(e) => handleInputChange('address.city', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-colors ${
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] outline-none transition-colors ${
                     errors.city ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="Nama kota/kabupaten"
@@ -238,7 +238,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                   id="postalCode"
                   value={customerData.address.postalCode}
                   onChange={(e) => handleInputChange('address.postalCode', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-colors ${
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] outline-none transition-colors ${
                     errors.postalCode ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="12345"
@@ -256,7 +256,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                 id="province"
                 value={customerData.address.province}
                 onChange={(e) => handleInputChange('address.province', e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-colors ${
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] outline-none transition-colors ${
                   errors.province ? 'border-red-500' : 'border-gray-300'
                 }`}
               >
@@ -279,7 +279,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                 rows={2}
                 value={customerData.address.notes || ''}
                 onChange={(e) => handleInputChange('address.notes', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-colors resize-none"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] outline-none transition-colors resize-none"
                 placeholder="Contoh: Rumah cat biru, sebelah warung Bu Sri"
               />
             </div>

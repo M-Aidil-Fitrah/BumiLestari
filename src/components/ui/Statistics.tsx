@@ -20,7 +20,7 @@ export const Statistic = ({
       {icon && (
         <div className="text-4xl mb-3">{icon}</div>
       )}
-      <div className="text-3xl md:text-4xl font-bold text-green-600 mb-2">
+      <div className="text-3xl md:text-4xl font-bold text-[#8B7355] mb-2">
         {prefix}{value}{suffix}
       </div>
       <div className="text-gray-600 font-medium">{label}</div>

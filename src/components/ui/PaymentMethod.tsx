@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Building2, Wallet, Smartphone, Truck, CreditCard, Banknote } from 'lucide-react';
 
 export interface PaymentMethodType {
   id: string;
@@ -14,7 +15,7 @@ const paymentMethods: PaymentMethodType[] = [
     id: 'bca',
     name: 'Transfer Bank BCA',
     type: 'bank',
-    icon: '🏦',
+    icon: 'Building2',
     description: 'Transfer manual ke rekening BCA',
     fee: 0
   },
@@ -22,7 +23,7 @@ const paymentMethods: PaymentMethodType[] = [
     id: 'mandiri',
     name: 'Transfer Bank Mandiri',
     type: 'bank',
-    icon: '🏦',
+    icon: 'Building2',
     description: 'Transfer manual ke rekening Mandiri',
     fee: 0
   },
@@ -30,7 +31,7 @@ const paymentMethods: PaymentMethodType[] = [
     id: 'gopay',
     name: 'GoPay',
     type: 'ewallet',
-    icon: '💚',
+    icon: 'Wallet',
     description: 'Bayar dengan GoPay',
     fee: 0
   },
@@ -38,7 +39,7 @@ const paymentMethods: PaymentMethodType[] = [
     id: 'ovo',
     name: 'OVO',
     type: 'ewallet',
-    icon: '🟣',
+    icon: 'Wallet',
     description: 'Bayar dengan OVO',
     fee: 0
   },
@@ -46,7 +47,7 @@ const paymentMethods: PaymentMethodType[] = [
     id: 'dana',
     name: 'DANA',
     type: 'ewallet',
-    icon: '🔵',
+    icon: 'Wallet',
     description: 'Bayar dengan DANA',
     fee: 0
   },
@@ -54,7 +55,7 @@ const paymentMethods: PaymentMethodType[] = [
     id: 'cod',
     name: 'Bayar di Tempat (COD)',
     type: 'cod',
-    icon: '💰',
+    icon: 'Banknote',
     description: 'Bayar saat barang diterima',
     fee: 5000
   }
@@ -88,13 +89,19 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
     cod: paymentMethods.filter(method => method.type === 'cod')
   };
 
-  const renderMethodGroup = (title: string, methods: PaymentMethodType[], groupKey: string) => (
+  const renderMethodGroup = (title: string, methods: PaymentMethodType[], groupKey: string) => {
+    const getGroupIcon = () => {
+      if (groupKey === 'bank') return <Building2 className="w-5 h-5 text-[#8B7355]" />;
+      if (groupKey === 'ewallet') return <Smartphone className="w-5 h-5 text-[#8B7355]" />;
+      if (groupKey === 'cod') return <Truck className="w-5 h-5 text-[#8B7355]" />;
+      return null;
+    };
+
+    return (
     <div key={groupKey} className="mb-6">
-      <h4 className="font-semibold text-gray-800 mb-3 flex items-center">
-        {groupKey === 'bank' && '🏦'} 
-        {groupKey === 'ewallet' && '📱'} 
-        {groupKey === 'cod' && '🚚'} 
-        <span className="ml-2">{title}</span>
+      <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+        {getGroupIcon()}
+        <span>{title}</span>
       </h4>
       <div className="space-y-2">
         {methods.map((method) => (
@@ -102,7 +109,7 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
             <div
               className={`p-4 cursor-pointer transition-colors duration-200 ${
                 selectedMethod === method.id
-                  ? 'bg-green-50 border-green-500'
+                  ? 'bg-[#8B7355]/5 border-[#8B7355]'
                   : 'bg-white hover:bg-gray-50'
               }`}
               onClick={() => {
@@ -117,10 +124,17 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
                       type="radio"
                       checked={selectedMethod === method.id}
                       onChange={() => onMethodChange(method.id)}
-                      className="w-4 h-4 text-green-600 focus:ring-green-500"
+                      className="w-4 h-4 text-[#8B7355] focus:ring-[#8B7355]"
                     />
                   </div>
-                  <span className="text-2xl">{method.icon}</span>
+                  {(() => {
+                    const iconMap: { [key: string]: React.ReactNode } = {
+                      'Building2': <Building2 className="w-6 h-6 text-gray-600" />,
+                      'Wallet': <Wallet className="w-6 h-6 text-gray-600" />,
+                      'Banknote': <Banknote className="w-6 h-6 text-gray-600" />
+                    };
+                    return iconMap[method.icon] || <CreditCard className="w-6 h-6 text-gray-600" />;
+                  })()}
                   <div>
                     <div className="font-medium text-gray-900">{method.name}</div>
                     <div className="text-sm text-gray-500">{method.description}</div>
@@ -128,7 +142,7 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
                 </div>
                 <div className="text-right">
                   <div className={`text-sm font-medium ${
-                    method.fee === 0 ? 'text-green-600' : 'text-gray-600'
+                    method.fee === 0 ? 'text-[#8B7355]' : 'text-gray-600'
                   }`}>
                     {formatFee(method.fee || 0)}
                   </div>
@@ -141,7 +155,7 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
             {/* Payment Instructions */}
             {selectedMethod === method.id && expandedMethod === method.id && (
-              <div className="px-4 pb-4 bg-green-50 border-t border-green-200">
+              <div className="px-4 pb-4 bg-[#8B7355]/5 border-t border-[#8B7355]/20">
                 <div className="mt-3">
                   {method.type === 'bank' && (
                     <div className="space-y-2">
@@ -185,7 +199,8 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
         ))}
       </div>
     </div>
-  );
+    );
+  };
 
   return (
     <div className={`bg-white rounded-lg shadow-md p-6 ${className}`}>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Sparkles, Truck } from 'lucide-react';
 import type { Product } from '../../data/products';
 
 export interface OrderItem {
@@ -60,7 +61,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                 <span className="text-sm text-gray-600">
                   Qty: {item.quantity}
                 </span>
-                <span className="font-semibold text-green-600">
+                <span className="font-semibold text-[#8B7355]">
                   {formatPrice(item.product.price)}
                 </span>
               </div>
@@ -91,18 +92,18 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
         <div className="border-t border-gray-200 pt-3">
           <div className="flex justify-between text-lg font-bold text-gray-800">
             <span>Total Pembayaran</span>
-            <span className="text-green-600">{formatPrice(total)}</span>
+            <span className="text-[#8B7355]">{formatPrice(total)}</span>
           </div>
         </div>
       </div>
 
       {/* Discount Info */}
-      <div className="mt-6 p-4 bg-green-50 rounded-lg">
+      <div className="mt-6 p-4 bg-[#8B7355]/5 rounded-lg">
         <div className="flex items-center space-x-2">
-          <span className="text-green-600 text-lg">🎉</span>
+          <Sparkles className="w-5 h-5 text-[#8B7355]" />
           <div>
-            <h4 className="font-medium text-green-800">Hemat Lingkungan!</h4>
-            <p className="text-sm text-green-600">
+            <h4 className="font-medium text-[#2C2C2C]">Hemat Lingkungan!</h4>
+            <p className="text-sm text-[#8B7355]">
               Dengan membeli produk ramah lingkungan, Anda turut menjaga kelestarian bumi.
             </p>
           </div>
@@ -110,12 +111,12 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
       </div>
 
       {/* Estimated Delivery */}
-      <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+      <div className="mt-4 p-4 bg-[#8B7355]/5 rounded-lg">
         <div className="flex items-center space-x-2">
-          <span className="text-blue-600 text-lg">🚚</span>
+          <Truck className="w-5 h-5 text-[#8B7355]" />
           <div>
-            <h4 className="font-medium text-blue-800">Estimasi Pengiriman</h4>
-            <p className="text-sm text-blue-600">
+            <h4 className="font-medium text-[#2C2C2C]">Estimasi Pengiriman</h4>
+            <p className="text-sm text-[#8B7355]">
               2-4 hari kerja (untuk area Jabodetabek)
             </p>
           </div>

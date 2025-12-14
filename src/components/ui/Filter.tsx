@@ -115,9 +115,9 @@ const Filter: React.FC<FilterProps> = ({ onFilterChange, className = "" }) => {
             className="w-full p-3 bg-white border border-[#8B7355]/30 rounded-xl focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] outline-none transition-all font-medium text-[#2C2C2C]"
           >
             <option value={0}>Semua Rating</option>
-            <option value={4}>4+ ⭐</option>
-            <option value={4.5}>4.5+ ⭐</option>
-            <option value={4.8}>4.8+ ⭐</option>
+            <option value={4}>4+ Bintang</option>
+            <option value={4.5}>4.5+ Bintang</option>
+            <option value={4.8}>4.8+ Bintang</option>
           </select>
         </div>
 

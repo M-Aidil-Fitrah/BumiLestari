@@ -98,7 +98,7 @@ const PaymentPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8B7355] mx-auto mb-4"></div>
           <p className="text-gray-600">Memuat halaman pembayaran...</p>
         </div>
       </div>
@@ -114,7 +114,7 @@ const PaymentPage: React.FC = () => {
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => navigate(-1)}
-                className="flex items-center text-green-600 hover:text-green-700 font-medium"
+                className="flex items-center text-[#8B7355] hover:text-[#6d5942] font-medium"
               >
                 <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -125,7 +125,7 @@ const PaymentPage: React.FC = () => {
             </div>
             
             {/* Security Badge */}
-            <div className="flex items-center space-x-2 text-green-600">
+            <div className="flex items-center space-x-2 text-[#8B7355]">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
               </svg>
@@ -167,7 +167,7 @@ const PaymentPage: React.FC = () => {
                 disabled={!isFormValid()}
                 className={`w-full mt-6 py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-200 ${
                   isFormValid()
-                    ? 'bg-green-600 hover:bg-green-700 text-white shadow-md hover:shadow-lg'
+                    ? 'bg-[#8B7355] hover:bg-[#6d5942] text-white shadow-md hover:shadow-lg'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 }`}
               >

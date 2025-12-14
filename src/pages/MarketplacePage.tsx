@@ -80,7 +80,7 @@ const MarketplacePage: React.FC = () => {
   };
 
   const handlePageChange = (page: number) => {
-    console.log('✅ Pagination clicked! Changing page to:', page);
+    console.log('Pagination clicked! Changing page to:', page);
     setCurrentPage(page);
     // Scroll to top of products section
     document.getElementById('products')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
