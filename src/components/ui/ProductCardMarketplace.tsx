@@ -44,66 +44,86 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
 
   return (
     <div 
-      className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer group"
+      className="bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group border border-gray-100 hover:border-gray-200"
       onClick={() => onClick?.(product)}
     >
-      <div className="relative overflow-hidden rounded-t-lg">
+      {/* Image */}
+      <div className="relative overflow-hidden aspect-square bg-gray-50">
         <img
           src={product.image}
           alt={product.name}
-          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
-            target.src = 'https://via.placeholder.com/400x300?text=No+Image';
+            target.src = 'https://via.placeholder.com/400x400?text=No+Image';
           }}
         />
-        {product.stock < 10 && (
-          <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
-            Stok Terbatas
-          </div>
-        )}
+        
+        {/* Badges */}
+        <div className="absolute top-3 left-3 flex flex-col gap-2">
+          {product.stock < 10 && (
+            <span className="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+              Sale
+            </span>
+          )}
+          {product.rating >= 4.8 && (
+            <span className="bg-[#8B7355] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+              Featured
+            </span>
+          )}
+        </div>
+        
+        {/* Quick View Button */}
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center">
+          <button className="opacity-0 group-hover:opacity-100 bg-white text-[#2C2C2C] px-6 py-2 rounded-full font-semibold shadow-lg transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
+            Lihat Detail
+          </button>
+        </div>
       </div>
       
+      {/* Content */}
       <div className="p-4">
-        <div className="mb-2">
-          <span className="inline-block bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded-full">
-            {product.category}
-          </span>
-        </div>
+        {/* Category Badge */}
+        <span className="inline-block text-xs text-[#8B7355] font-medium mb-2">
+          {product.category}
+        </span>
 
-        <h3 className="font-bold text-gray-800 text-lg mb-2 line-clamp-2 group-hover:text-green-600 transition-colors">
+        {/* Product Name */}
+        <h3 className="font-bold text-[#2C2C2C] text-base mb-2 line-clamp-2 min-h-[48px]" style={{ fontFamily: 'var(--font-heading)' }}>
           {product.name}
         </h3>
 
-        <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-          {product.description}
-        </p>
-
-        <div className="flex items-center mb-2">
+        {/* Rating */}
+        <div className="flex items-center gap-1 mb-3">
           <div className="flex items-center">
             {renderStars(product.rating)}
           </div>
-          <span className="ml-2 text-sm text-gray-500">
-            ({product.reviews} ulasan)
+          <span className="text-xs text-gray-500">
+            ({product.reviews})
           </span>
         </div>
 
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-2xl font-bold text-green-600">
-            {formatPrice(product.price)}
-          </span>
-          <span className="text-sm text-gray-500">
-            Stok: {product.stock}
-          </span>
+        {/* Price and Action */}
+        <div className="flex items-center justify-between">
+          <div>
+            <span className="text-xl font-bold text-[#2C2C2C]" style={{ fontFamily: 'var(--font-heading)' }}>
+              {formatPrice(product.price)}
+            </span>
+          </div>
+          
+          {/* Add to Cart Icon */}
+          <button 
+            className="w-10 h-10 bg-[#2C2C2C] hover:bg-[#8B7355] text-white rounded-full flex items-center justify-center transition-colors duration-300"
+            onClick={(e) => {
+              e.stopPropagation();
+              // Add to cart functionality
+            }}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </button>
         </div>
-
-        <div className="text-sm text-gray-500 mb-3">
-          Oleh: {product.seller}
-        </div>
-
-        <button className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200">
-          Lihat Detail
-        </button>
       </div>
     </div>
   );

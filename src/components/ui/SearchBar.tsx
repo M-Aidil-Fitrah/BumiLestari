@@ -27,21 +27,20 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   return (
     <form onSubmit={handleSubmit} className={`relative ${className}`}>
-      <div className="relative">
+      <div className="relative group">
         <input
           type="text"
           value={searchTerm}
           onChange={handleChange}
           placeholder={placeholder}
-          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-colors duration-200"
+          className="w-full pl-12 pr-4 py-3 bg-white border border-[#8B7355]/30 rounded-xl focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] outline-none transition-all duration-300 placeholder:text-gray-400 text-[#2C2C2C] text-sm"
         />
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
           <svg
-            className="h-5 w-5 text-gray-400"
+            className="h-5 w-5 text-[#8B7355]"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
           >
             <path
               strokeLinecap="round"
@@ -58,14 +57,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
               setSearchTerm('');
               onSearch('');
             }}
-            className="absolute inset-y-0 right-0 pr-3 flex items-center"
+            className="absolute inset-y-0 right-0 pr-4 flex items-center"
           >
             <svg
-              className="h-5 w-5 text-gray-400 hover:text-gray-600"
+              className="h-5 w-5 text-gray-400 hover:text-[#8B7355] transition-colors duration-200"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
             >
               <path
                 strokeLinecap="round"

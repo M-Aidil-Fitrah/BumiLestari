@@ -380,7 +380,8 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
   return (
     <div
-      className={`sm-scope z-40 ${isFixed ? 'fixed top-0 left-0 w-screen h-screen overflow-hidden pointer-events-none' : 'w-full h-full'}`}
+      className={`sm-scope ${isFixed ? 'fixed top-0 left-0 right-0 z-40 pointer-events-none' : 'w-full h-full z-40'}`}
+      style={isFixed ? { height: open ? '100vh' : 'auto' } : undefined}
     >
       {/* Backdrop/Overlay ketika menu terbuka */}
       {open && (
@@ -392,7 +393,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       )}
 
       <div
-        className={(className ? className + ' ' : '') + `staggered-menu-wrapper relative w-full h-full z-40 ${open ? 'pointer-events-auto' : 'pointer-events-none'}`}
+        className={(className ? className + ' ' : '') + `staggered-menu-wrapper relative w-full z-40 ${open ? 'pointer-events-auto h-full' : 'pointer-events-none h-auto'}`}
         style={accentColor ? ({ ['--sm-accent' as any]: accentColor } as React.CSSProperties) : undefined}
         data-position={position}
         data-open={open || undefined}
@@ -420,10 +421,10 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
         </div>
 
         <header
-          className="staggered-menu-header absolute top-0 left-0 w-full flex items-center justify-between p-[1em_2em] bg-transparent pointer-events-none z-20"
+          className="staggered-menu-header absolute top-0 left-0 right-0 flex items-center justify-between p-[1em_2em] bg-transparent pointer-events-none z-20"
           aria-label="Main navigation header"
         >
-          <div className="sm-logo flex items-center select-none pointer-events-auto" aria-label="Logo">
+          <div className="sm-logo flex items-center select-none pointer-events-auto w-auto" aria-label="Logo">
             <img
               src={logoUrl || '/src/assets/logos/reactbits-gh-white.svg'}
               alt="Logo"
@@ -436,7 +437,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
           <button
             ref={toggleBtnRef}
-            className={`sm-toggle relative inline-flex items-center gap-[0.3rem] bg-transparent border-0 cursor-pointer font-medium leading-none overflow-visible pointer-events-auto ${
+            className={`sm-toggle relative inline-flex items-center gap-[0.3rem] bg-transparent border-0 cursor-pointer font-medium leading-none overflow-visible pointer-events-auto w-auto ${
               open ? 'text-black' : 'text-[#e9e9ef]'
             }`}
             aria-label={open ? 'Close menu' : 'Open menu'}
