@@ -12,7 +12,7 @@ export const ScrollToTopButton = ({ isVisible, onClick }: ScrollToTopButtonProps
       {isVisible && (
         <motion.button
           onClick={onClick}
-          className="fixed bottom-6 right-6 w-14 h-14 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-lg z-50"
+          className="fixed bottom-6 right-6 w-14 h-14 bg-[#8B7355] hover:bg-[#7a6449] text-white rounded-full shadow-lg z-50"
           variants={buttonVariants}
           initial={{ scale: 0, opacity: 0, rotate: -180 }}
           animate={{ scale: 1, opacity: 1, rotate: 0 }}

@@ -1,17 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { dummyProducts } from '../data/products';
 import ProductImageGallery from '../components/ui/ProductImageGallery';
 import ProductInfo from '../components/ui/ProductInfo';
 import ReviewSection from '../components/ui/ReviewSection';
-import { Navigation, Footer } from '../components/ui/Navigation';
-import { ScrollToTopButton } from '../components/ui/ScrollToTopButton';
+import Navbar from '../components/ui/Navbar';
+import { Footer } from '../components/ui/Footer';
 import type { Product } from '../data/products';
 
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [isScrolled, setIsScrolled] = useState(false);
 
   // Find product by ID
   const product = dummyProducts.find(p => p.id === id);
@@ -40,22 +39,6 @@ const ProductDetailPage: React.FC = () => {
     );
   }
 
-  // Handle scroll effects for navigation
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      setIsScrolled(scrollPosition > 50);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Scroll to top helper
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   const handleAddToCart = (product: Product, quantity: number) => {
     // TODO: Implement add to cart functionality
     console.log('Add to cart:', product, quantity);
@@ -79,7 +62,7 @@ const ProductDetailPage: React.FC = () => {
   return (
     <div className="min-h-screen">
       {/* Navigation */}
-      <Navigation isScrolled={isScrolled} />
+      <Navbar />
 
       <main className="bg-gray-50">
         <div className="bg-white shadow-sm">
@@ -210,9 +193,6 @@ const ProductDetailPage: React.FC = () => {
 
       {/* Footer */}
       <Footer />
-
-      {/* Scroll to Top Button */}
-      <ScrollToTopButton isVisible={isScrolled} onClick={scrollToTop} />
     </div>
   );
 };

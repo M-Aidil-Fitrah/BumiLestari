@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Hero } from '../components/ui/Hero';
-import { Navigation, Footer } from '../components/ui/Navigation';
+import Navbar from '../components/ui/Navbar';
+import Footer from '../components/ui/Footer';
 import { ScrollToTopButton } from '../components/ui/ScrollToTopButton';
 import { ProductSection } from '../components/container/ProductSection';
 import { AboutSection } from '../components/container/AboutSection';
 import { TestimonialSection } from '../components/container/TestimonialSection';
-import Newsletter from '../components/container/NewsletterSection';
+import CTASection from '../components/container/CTASection';
 
 export const LandingPage = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -39,15 +40,15 @@ export const LandingPage = () => {
       transition={{ duration: 0.5 }}
     >
       {/* Navigation */}
-      <Navigation isScrolled={isScrolled} />
+      <Navbar isScrolled={isScrolled} />
 
       {/* Main Content */}
       <main>
         {/* Hero Section */}
         <Hero 
           title="BumiLestari"
-          subtitle="for your sustainable living"
-          ctaText="Explore Products"
+          subtitle="untuk kehidupan berkelanjutan Anda"
+          ctaText="Jelajahi Produk"
         />
 
         {/* About Section */}
@@ -55,7 +56,7 @@ export const LandingPage = () => {
 
         {/* Featured Products Section */}
         <ProductSection 
-          title="Products"
+          title="Produk Pilihan"
           showAll={false}
           maxProducts={3}
           categoryFilter="all"
@@ -64,8 +65,8 @@ export const LandingPage = () => {
         {/* Testimonials Section */}
         <TestimonialSection />
 
-        {/* Newsletter Section */}
-        <Newsletter />
+        {/* CTA Section */}
+        <CTASection />
       </main>
 
       {/* Footer */}

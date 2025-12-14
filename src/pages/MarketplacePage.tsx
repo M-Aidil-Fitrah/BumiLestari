@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { dummyProducts } from '../data/products';
 import type { Product } from '../data/products';
@@ -6,7 +6,8 @@ import SearchBar from '../components/ui/SearchBar';
 import Filter, { type FilterOptions } from '../components/ui/Filter';
 import ProductCardMarketplace from '../components/ui/ProductCardMarketplace';
 import Pagination from '../components/ui/Pagination';
-import { Navigation, Footer } from '../components/ui/Navigation';
+import Navbar from '../components/ui/Navbar';
+import { Footer } from '../components/ui/Footer';
 
 const MarketplacePage: React.FC = () => {
   const navigate = useNavigate();
@@ -77,17 +78,9 @@ const MarketplacePage: React.FC = () => {
     navigate(`/marketplace/product/${product.id}`);
   };
 
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
-      <Navigation isScrolled={isScrolled} />
+      <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row gap-8">

@@ -1,23 +1,24 @@
 import { motion } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
 
 export const AboutSection = () => {
   const features = [
     {
       number: '01',
-      title: 'Crafted With Intention',
-      description: 'Setiap produk kami dibuat dengan perhatian terhadap detail dan dampak lingkungan. Kami memilih bahan-bahan terbaik yang ramah lingkungan untuk memastikan kualitas dan keberlanjutan.',
+      title: 'Crafted With Care',
+      description: 'Setiap produk BumiLestari dipilih dengan cermat untuk memastikan kualitas terbaik dan dampak minimal terhadap lingkungan. Kami hanya bekerja sama dengan produsen yang berkomitmen pada keberlanjutan.',
       image: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=600'
     },
     {
       number: '02',
-      title: 'Scents That Tell A Story',
-      description: 'Koleksi produk kami dirancang untuk menciptakan pengalaman yang bermakna. Dari aroma natural hingga tekstur organik, semuanya bercerita tentang komitmen kami pada bumi.',
+      title: 'Sustainable Materials',
+      description: 'Dari bambu organik hingga bahan daur ulang, setiap produk di BumiLestari menggunakan material ramah lingkungan yang dapat terurai secara alami atau didaur ulang dengan mudah.',
       image: 'https://images.unsplash.com/photo-1603006905003-be475563bc59?w=600'
     },
     {
       number: '03',
-      title: 'Designed For Serenity',
-      description: 'Menciptakan ketenangan dalam kehidupan sehari-hari melalui produk yang tidak hanya indah, tetapi juga bertanggung jawab terhadap lingkungan dan masa depan planet kita.',
+      title: 'Designed For Earth',
+      description: 'BumiLestari hadir untuk memudahkan Anda menjalani gaya hidup berkelanjutan tanpa mengorbankan kualitas dan estetika. Bersama-sama kita ciptakan masa depan yang lebih hijau.',
       image: 'https://images.unsplash.com/photo-1615486511262-2f3fa7c54c81?w=600'
     }
   ];
@@ -25,6 +26,27 @@ export const AboutSection = () => {
   return (
     <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Title */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
+          <h2 
+            className="text-5xl md:text-6xl font-bold text-[#2C2C2C] mb-4"
+            style={{ fontFamily: 'var(--font-heading)' }}
+          >
+            Tentang BumiLestari
+          </h2>
+          <p 
+            className="text-xl text-gray-600 max-w-2xl mx-auto"
+            style={{ fontFamily: 'var(--font-body)' }}
+          >
+            Menyediakan produk ramah lingkungan untuk gaya hidup berkelanjutan
+          </p>
+        </motion.div>
+
         {/* Feature Cards */}
         <div className="grid md:grid-cols-2 gap-8 mb-16">
           {features.slice(0, 2).map((feature, index) => (
@@ -58,10 +80,8 @@ export const AboutSection = () => {
                   {feature.description}
                 </p>
                 <button className="flex items-center gap-2 text-gray-900 font-medium group-hover:gap-3 transition-all">
-                  <span>Learn More</span>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
+                  <span>Pelajari Lebih Lanjut</span>
+                  <ArrowRight className="w-5 h-5" />
                 </button>
               </div>
             </motion.div>
@@ -135,7 +155,7 @@ export const AboutSection = () => {
               className="text-white text-xl md:text-2xl font-medium"
               style={{ fontFamily: 'var(--font-heading)' }}
             >
-              Discover How Serenity Can Transform Your Space Into A Haven Of Calm
+              Discover How BumiLestari Transforms Your Lifestyle Into A Sustainable Journey
             </p>
           </div>
         </motion.div>
@@ -143,3 +163,4 @@ export const AboutSection = () => {
     </section>
   );
 };
+

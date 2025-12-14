@@ -1,24 +1,25 @@
 import { motion } from 'framer-motion';
+import { Quote } from 'lucide-react';
 
 export const TestimonialSection = () => {
   const testimonials = [
     {
       id: 1,
-      quote: "The quality is outstanding, from the texture to the design. Every detail feels intentional. This has completely transformed my evening routine!",
+      quote: "Kualitasnya luar biasa, dari tekstur hingga desainnya. Setiap detail terasa sangat diperhatikan. Ini benar-benar mengubah rutinitas malam saya!",
       author: "Ela Soleha",
       bgColor: 'bg-[#F5F3EE]'
     },
     {
       id: 2,
-      quote: "I love how sustainable and beautiful these products are. They bring a sense of calm to my space while being good for the environment. Highly recommend!",
-      author: "Sarah Smith",
+      quote: "Saya sangat suka betapa berkelanjutan dan indahnya produk-produk ini. Mereka membawa rasa tenang ke rumah saya sambil ramah lingkungan. Sangat direkomendasikan!",
+      author: "Sarah Putri",
       bgColor: 'bg-[#2C2C2C]',
       textColor: 'text-white'
     },
     {
       id: 3,
-      quote: "Every product tells a story of craftsmanship and care. The natural scents are incredible, and I feel good knowing they're eco-friendly.",
-      author: "Mike Foster",
+      quote: "Setiap produk menceritakan kisah kerajinan dan perhatian. Aroma alaminya luar biasa, dan saya merasa senang mengetahui mereka ramah lingkungan.",
+      author: "Budi Santoso",
       bgColor: 'bg-[#F5F3EE]'
     }
   ];
@@ -34,14 +35,12 @@ export const TestimonialSection = () => {
           viewport={{ once: true }}
         >
           <div className="flex items-center gap-3 mb-6">
-            <svg className="w-10 h-10 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-            </svg>
+            <Quote className="w-10 h-10 text-gray-400" />
             <h2 
               className="text-4xl md:text-5xl font-bold text-gray-900"
               style={{ fontFamily: 'var(--font-heading)' }}
             >
-              What our<br />customers are saying
+              Apa Kata<br />Pelanggan Kami
             </h2>
           </div>
         </motion.div>
@@ -58,13 +57,7 @@ export const TestimonialSection = () => {
               className={`${testimonial.bgColor} ${testimonial.textColor || 'text-gray-900'} rounded-3xl p-8 hover:shadow-xl transition-all duration-300`}
             >
               {/* Quote Icon */}
-              <svg 
-                className={`w-8 h-8 mb-6 ${testimonial.textColor === 'text-white' ? 'text-white/30' : 'text-gray-300'}`} 
-                fill="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-              </svg>
+              <Quote className={`w-8 h-8 mb-6 ${testimonial.textColor === 'text-white' ? 'text-white/30' : 'text-gray-300'}`} />
 
               {/* Quote Text */}
               <p 

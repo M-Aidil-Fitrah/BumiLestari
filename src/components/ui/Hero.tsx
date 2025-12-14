@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { ArrowRight, Tag, TrendingUp, Package } from 'lucide-react';
 
 interface HeroProps {
   title?: string;
@@ -10,8 +11,8 @@ interface HeroProps {
 
 export const Hero = ({
   title = "BumiLestari",
-  subtitle = "for your sustainable living",
-  ctaText = "Explore Products",
+  subtitle = "untuk kehidupan berkelanjutan Anda",
+  ctaText = "Jelajahi Produk",
   onCtaClick
 }: HeroProps) => {
   const navigate = useNavigate();
@@ -19,35 +20,37 @@ export const Hero = ({
   const handleCtaClick = () => {
     if (onCtaClick) {
       onCtaClick();
-    } else {
-      navigate('/marketplace');
     }
+    navigate('/marketplace');
   };
 
   const featuredProducts = [
     {
       id: 1,
-      name: 'Eco Bamboo Set',
+      name: 'Set Bambu Eco',
       image: 'https://images.unsplash.com/photo-1556911261-6bd341186b2f?w=500',
-      tag: 'Best Seller'
+      tag: 'Terlaris',
+      icon: Package
     },
     {
       id: 2,
-      name: 'Natural Reed Diffuser',
+      name: 'Diffuser Alami',
       image: 'https://images.unsplash.com/photo-1602874801006-95d526319489?w=500',
-      tag: 'New Arrival'
+      tag: 'Baru',
+      icon: Tag
     },
     {
       id: 3,
-      name: 'Organic Candles',
+      name: 'Lilin Organik',
       image: 'https://images.unsplash.com/photo-1602874801234-01ad4c5c97e9?w=500',
-      tag: 'Trending'
+      tag: 'Trending',
+      icon: TrendingUp
     }
   ];
 
   return (
     <motion.section 
-      className="relative pt-24 pb-16 min-h-screen bg-[#F5F3EE] overflow-hidden"
+      className="relative h-screen bg-[#F5F3EE] overflow-hidden flex items-center justify-center"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
@@ -55,7 +58,7 @@ export const Hero = ({
       {/* Background gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#F5F3EE]/80 to-[#F5F3EE]"></div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-16">
         {/* Hero Content */}
         <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
           {/* Left Content */}
@@ -101,9 +104,7 @@ export const Hero = ({
               transition={{ delay: 0.8 }}
             >
               <span>{ctaText}</span>
-              <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </motion.button>
           </motion.div>
 

@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { dummyProducts } from '../../data/products';
 import type { Product } from '../../data/products';
+import { ArrowRight, Star, ShoppingBag } from 'lucide-react';
 
 interface ProductSectionProps {
   title?: string;
@@ -11,7 +12,7 @@ interface ProductSectionProps {
 }
 
 export const ProductSection = ({
-  title = "Products",
+  title = "Produk",
   maxProducts = 3,
 }: ProductSectionProps) => {
   const navigate = useNavigate();
@@ -54,10 +55,8 @@ export const ProductSection = ({
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <span>View All</span>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
+            <span>Lihat Semua</span>
+            <ArrowRight className="w-5 h-5" />
           </motion.button>
         </div>
 
@@ -78,7 +77,7 @@ export const ProductSection = ({
                 {/* Badge */}
                 {index === 0 && (
                   <div className="absolute top-4 left-4 z-10 bg-[#D4AF37] text-white px-3 py-1 rounded-full text-xs font-bold">
-                    BEST SELLER
+                    TERLARIS
                   </div>
                 )}
                 
@@ -110,9 +109,7 @@ export const ProductSection = ({
                       </p>
                     </div>
                     <div className="flex items-center gap-1">
-                      <svg className="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                      </svg>
+                      <Star className="w-5 h-5 text-yellow-400 fill-current" />
                       <span className="text-sm font-medium text-gray-700">{product.rating}</span>
                     </div>
                   </div>
@@ -126,9 +123,7 @@ export const ProductSection = ({
                       Rp {product.price.toLocaleString('id-ID')}
                     </span>
                     <button className="flex items-center justify-center w-10 h-10 bg-gray-900 text-white rounded-full group-hover:bg-[#8B7355] transition-all group-hover:scale-110">
-                      <svg className="w-5 h-5 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                      </svg>
+                      <ShoppingBag className="w-5 h-5 group-hover:rotate-12 transition-transform" />
                     </button>
                   </div>
                 </div>
