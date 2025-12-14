@@ -131,32 +131,19 @@ export const AboutSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.6 }}
-          className="mt-16 relative h-96 rounded-3xl overflow-hidden shadow-2xl group cursor-pointer"
+          className="mt-16 relative rounded-3xl overflow-hidden shadow-2xl"
         >
-          <img 
-            src="https://images.unsplash.com/photo-1608181563494-bb4d8939afa4?w=1200" 
-            alt="Sustainable Living"
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent"></div>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className="w-20 h-20 bg-white/90 rounded-full flex items-center justify-center shadow-xl group-hover:bg-white transition-all"
-            >
-              <svg className="w-8 h-8 text-gray-900 ml-1" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            </motion.button>
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 p-8">
-            <p 
-              className="text-white text-xl md:text-2xl font-medium"
-              style={{ fontFamily: 'var(--font-heading)' }}
-            >
-              Discover How BumiLestari Transforms Your Lifestyle Into A Sustainable Journey
-            </p>
+          <div className="aspect-video w-full">
+            <iframe
+              width="100%"
+              height="100%"
+              src="https://www.youtube.com/embed/j4qezIj3tsc"
+              title="BumiLestari - Sustainable Living"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              className="w-full h-full"
+            />
           </div>
         </motion.div>
       </div>

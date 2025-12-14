@@ -28,14 +28,14 @@ export const Hero = ({
     {
       id: 1,
       name: 'Set Bambu Eco',
-      image: 'https://images.unsplash.com/photo-1556911261-6bd341186b2f?w=500',
+      image: 'https://images.unsplash.com/photo-1591939877452-e85f5c2f54bc?w=500',
       tag: 'Terlaris',
       icon: Package
     },
     {
       id: 2,
       name: 'Diffuser Alami',
-      image: 'https://images.unsplash.com/photo-1602874801006-95d526319489?w=500',
+      image: 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=500',
       tag: 'Baru',
       icon: Tag
     },
