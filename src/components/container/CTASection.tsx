@@ -31,6 +31,7 @@ export const CTASection: React.FC = () => {
 
   return (
     <section className="py-20 bg-gradient-to-br from-[#2C2C2C] via-[#1a1a1a] to-[#2C2C2C] relative overflow-hidden">
+      <img src="/images/cta-decor.svg" alt="decorative" className="pointer-events-none absolute -right-16 -bottom-16 w-64 opacity-80 hidden md:block" />
       {/* Decorative Elements */}
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#8B7355] to-transparent"></div>
       
@@ -117,3 +118,4 @@ export const CTASection: React.FC = () => {
 };
 
 export default CTASection;
+

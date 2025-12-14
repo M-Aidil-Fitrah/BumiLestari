@@ -7,20 +7,23 @@ export const TestimonialSection = () => {
       id: 1,
       quote: "Kualitasnya luar biasa, dari tekstur hingga desainnya. Setiap detail terasa sangat diperhatikan. Ini benar-benar mengubah rutinitas malam saya!",
       author: "Ela Soleha",
-      bgColor: 'bg-[#F5F3EE]'
+      bgColor: 'bg-[#F5F3EE]',
+      image: '/images/avatar1.svg'
     },
     {
       id: 2,
       quote: "Saya sangat suka betapa berkelanjutan dan indahnya produk-produk ini. Mereka membawa rasa tenang ke rumah saya sambil ramah lingkungan. Sangat direkomendasikan!",
       author: "Sarah Putri",
       bgColor: 'bg-[#2C2C2C]',
-      textColor: 'text-white'
+      textColor: 'text-white',
+      image: '/images/avatar2.svg'
     },
     {
       id: 3,
       quote: "Setiap produk menceritakan kisah kerajinan dan perhatian. Aroma alaminya luar biasa, dan saya merasa senang mengetahui mereka ramah lingkungan.",
       author: "Budi Santoso",
-      bgColor: 'bg-[#F5F3EE]'
+      bgColor: 'bg-[#F5F3EE]',
+      image: '/images/avatar3.svg'
     }
   ];
 
@@ -69,9 +72,7 @@ export const TestimonialSection = () => {
 
               {/* Author */}
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-full ${testimonial.textColor === 'text-white' ? 'bg-white/20' : 'bg-gray-200'} flex items-center justify-center font-bold`}>
-                  {testimonial.author.charAt(0)}
-                </div>
+                <img src={testimonial.image} alt={testimonial.author} className="w-10 h-10 rounded-full object-cover" />
                 <p 
                   className="font-semibold"
                   style={{ fontFamily: 'var(--font-body)' }}

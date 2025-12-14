@@ -28,21 +28,21 @@ export const Hero = ({
     {
       id: 1,
       name: 'Set Bambu Eco',
-      image: 'https://images.unsplash.com/photo-1591939877452-e85f5c2f54bc?w=500',
+      image: '/images/bambueco.jpeg',
       tag: 'Terlaris',
       icon: Package
     },
     {
       id: 2,
       name: 'Diffuser Alami',
-      image: 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=500',
+      image: '/images/diffuser.jpg',
       tag: 'Baru',
       icon: Tag
     },
     {
       id: 3,
       name: 'Lilin Organik',
-      image: 'https://images.unsplash.com/photo-1602874801234-01ad4c5c97e9?w=500',
+      image: '/images/lilin.jpg',
       tag: 'Trending',
       icon: TrendingUp
     }
