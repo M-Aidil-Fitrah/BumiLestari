@@ -1,140 +1,145 @@
-import { FeaturesGrid } from '../ui/Feature';
-import { StatisticsGrid } from '../ui/Statistics';
-import { withScrollAnimation } from '../../hoc/withScrollAnimation';
-import { withAnalytics } from '../../hoc/withAnalytics';
+import { motion } from 'framer-motion';
 
-interface AboutSectionProps {
-  title?: string;
-  subtitle?: string;
-}
-
-const AboutSectionBase = ({
-  title = "Tentang BumiLestari",
-  subtitle = "Komitmen kami untuk masa depan yang berkelanjutan"
-}: AboutSectionProps) => {
+export const AboutSection = () => {
   const features = [
     {
-      icon: "🌱",
-      title: "100% Ramah Lingkungan",
-      description: "Semua produk kami dipilih dengan standar ketat untuk memastikan dampak minimal terhadap lingkungan dan dapat didaur ulang atau biodegradable."
+      number: '01',
+      title: 'Crafted With Intention',
+      description: 'Setiap produk kami dibuat dengan perhatian terhadap detail dan dampak lingkungan. Kami memilih bahan-bahan terbaik yang ramah lingkungan untuk memastikan kualitas dan keberlanjutan.',
+      image: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=600'
     },
     {
-      icon: "✅",
-      title: "Kualitas Terjamin",
-      description: "Setiap produk melalui proses seleksi ketat dan bekerja sama dengan supplier terpercaya yang memiliki sertifikasi sustainability."
+      number: '02',
+      title: 'Scents That Tell A Story',
+      description: 'Koleksi produk kami dirancang untuk menciptakan pengalaman yang bermakna. Dari aroma natural hingga tekstur organik, semuanya bercerita tentang komitmen kami pada bumi.',
+      image: 'https://images.unsplash.com/photo-1603006905003-be475563bc59?w=600'
     },
     {
-      icon: "🚚",
-      title: "Pengiriman Eco-Friendly",
-      description: "Kami menggunakan packaging ramah lingkungan dan bekerja sama dengan kurir yang mendukung program carbon offset."
-    },
-    {
-      icon: "💰",
-      title: "Harga Terjangkau",
-      description: "Misi kami adalah membuat produk ramah lingkungan dapat diakses oleh semua kalangan dengan harga yang kompetitif."
-    },
-    {
-      icon: "🤝",
-      title: "Komunitas Peduli",
-      description: "Bergabung dengan komunitas yang peduli lingkungan dan dapatkan tips, edukasi, serta inspirasi untuk hidup berkelanjutan."
-    },
-    {
-      icon: "🏆",
-      title: "Award Winning",
-      description: "Telah meraih berbagai penghargaan sebagai platform e-commerce terbaik untuk produk berkelanjutan di Indonesia."
-    }
-  ];
-
-  const statistics = [
-    {
-      value: "50K+",
-      label: "Pelanggan Puas",
-      icon: "👥",
-      prefix: "",
-      suffix: ""
-    },
-    {
-      value: "1000+",
-      label: "Produk Eco-Friendly",
-      icon: "🛍️",
-      prefix: "",
-      suffix: ""
-    },
-    {
-      value: "500+",
-      label: "Ton Plastik Dikurangi",
-      icon: "♻️",
-      prefix: "",
-      suffix: ""
-    },
-    {
-      value: "99",
-      label: "Kepuasan Pelanggan",
-      icon: "⭐",
-      prefix: "",
-      suffix: "%"
+      number: '03',
+      title: 'Designed For Serenity',
+      description: 'Menciptakan ketenangan dalam kehidupan sehari-hari melalui produk yang tidak hanya indah, tetapi juga bertanggung jawab terhadap lingkungan dan masa depan planet kita.',
+      image: 'https://images.unsplash.com/photo-1615486511262-2f3fa7c54c81?w=600'
     }
   ];
 
   return (
-    <section id="about" className="py-16 bg-gradient-to-br from-green-50 to-blue-50">
+    <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-            {title}
-          </h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-8">
-            {subtitle}
-          </p>
+        {/* Feature Cards */}
+        <div className="grid md:grid-cols-2 gap-8 mb-16">
+          {features.slice(0, 2).map((feature, index) => (
+            <motion.div
+              key={feature.number}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.2 }}
+              className="group"
+            >
+              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-50 to-gray-100 p-8 md:p-10 hover:shadow-2xl transition-all duration-500">
+                <div className="flex items-start justify-between mb-6">
+                  <span 
+                    className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-gray-200 to-gray-300"
+                    style={{ fontFamily: 'var(--font-heading)' }}
+                  >
+                    {feature.number}
+                  </span>
+                </div>
+                <h3 
+                  className="text-3xl font-bold text-gray-900 mb-4"
+                  style={{ fontFamily: 'var(--font-heading)' }}
+                >
+                  {feature.title}
+                </h3>
+                <p 
+                  className="text-gray-600 leading-relaxed mb-6"
+                  style={{ fontFamily: 'var(--font-body)' }}
+                >
+                  {feature.description}
+                </p>
+                <button className="flex items-center gap-2 text-gray-900 font-medium group-hover:gap-3 transition-all">
+                  <span>Learn More</span>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </button>
+              </div>
+            </motion.div>
+          ))}
         </div>
 
-        {/* Mission Statement */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-12 max-w-4xl mx-auto">
-          <div className="text-center">
-            <div className="text-5xl mb-4">🌍</div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-4">Misi Kami</h3>
-            <p className="text-lg text-gray-600 leading-relaxed">
-              BumiLestari hadir untuk memudahkan setiap orang dalam mengadopsi gaya hidup berkelanjutan. 
-              Kami menyediakan platform yang menghubungkan konsumen dengan produk-produk ramah lingkungan 
-              berkualitas tinggi, sambil mengedukasi pentingnya menjaga kelestarian bumi untuk generasi mendatang.
+        {/* Third Feature with Image */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.4 }}
+          className="grid md:grid-cols-2 gap-8 items-center"
+        >
+          <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl p-8 md:p-10">
+            <span 
+              className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-gray-200 to-gray-300"
+              style={{ fontFamily: 'var(--font-heading)' }}
+            >
+              {features[2].number}
+            </span>
+            <h3 
+              className="text-3xl font-bold text-gray-900 mt-6 mb-4"
+              style={{ fontFamily: 'var(--font-heading)' }}
+            >
+              {features[2].title}
+            </h3>
+            <p 
+              className="text-gray-600 leading-relaxed"
+              style={{ fontFamily: 'var(--font-body)' }}
+            >
+              {features[2].description}
             </p>
           </div>
-        </div>
+          <div className="relative h-96 rounded-3xl overflow-hidden shadow-xl">
+            <img 
+              src={features[2].image} 
+              alt={features[2].title}
+              className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
+            />
+          </div>
+        </motion.div>
 
-        {/* Features Grid */}
-        <div className="mb-16">
-          <h3 className="text-2xl font-bold text-center text-gray-800 mb-8">
-            Mengapa Memilih BumiLestari?
-          </h3>
-          <FeaturesGrid features={features} />
-        </div>
-
-        {/* Statistics */}
-        <div className="bg-white rounded-2xl shadow-lg p-8">
-          <h3 className="text-2xl font-bold text-center text-gray-800 mb-8">
-            Dampak Positif Kami
-          </h3>
-          <StatisticsGrid statistics={statistics} />
-        </div>
-
-        {/* Vision Statement */}
-        <div className="mt-12 text-center max-w-4xl mx-auto">
-          <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-2xl p-8">
-            <h3 className="text-2xl font-bold mb-4">Visi Kami</h3>
-            <p className="text-lg leading-relaxed">
-              Menjadi platform marketplace terdepan di Indonesia yang menginspirasi dan memfasilitasi 
-              jutaan orang untuk menjalani gaya hidup berkelanjutan, sehingga terciptanya masa depan 
-              yang lebih hijau dan lestari untuk semua.
+        {/* Video Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.6 }}
+          className="mt-16 relative h-96 rounded-3xl overflow-hidden shadow-2xl group cursor-pointer"
+        >
+          <img 
+            src="https://images.unsplash.com/photo-1608181563494-bb4d8939afa4?w=1200" 
+            alt="Sustainable Living"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent"></div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              className="w-20 h-20 bg-white/90 rounded-full flex items-center justify-center shadow-xl group-hover:bg-white transition-all"
+            >
+              <svg className="w-8 h-8 text-gray-900 ml-1" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </motion.button>
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 p-8">
+            <p 
+              className="text-white text-xl md:text-2xl font-medium"
+              style={{ fontFamily: 'var(--font-heading)' }}
+            >
+              Discover How Serenity Can Transform Your Space Into A Haven Of Calm
             </p>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
 };
-
-export const AboutSection = withAnalytics(
-  withScrollAnimation(AboutSectionBase),
-  'about_section_view'
-);

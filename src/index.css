@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* Custom fonts */
+:root {
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Inter', sans-serif;
+}
+
 /* Custom animations and utilities */
 @keyframes fade-in-up {
   from {

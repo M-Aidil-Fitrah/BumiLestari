@@ -7,7 +7,6 @@ import { ProductSection } from '../components/container/ProductSection';
 import { AboutSection } from '../components/container/AboutSection';
 import { TestimonialSection } from '../components/container/TestimonialSection';
 import Newsletter from '../components/container/NewsletterSection';
-import { pageVariants, staggerChildrenVariants } from '../animations/variants';
 
 export const LandingPage = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -33,27 +32,22 @@ export const LandingPage = () => {
 
   return (
     <motion.div 
-      className="min-h-screen"
-      initial="initial"
-      animate="in"
-      exit="out"
-      variants={pageVariants}
-      transition={{ duration: 0.5, ease: "easeInOut" }}
+      className="min-h-screen bg-white"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
     >
       {/* Navigation */}
       <Navigation isScrolled={isScrolled} />
 
       {/* Main Content */}
-      <motion.main
-        variants={staggerChildrenVariants}
-        initial="hidden"
-        animate="visible"
-      >
+      <main>
         {/* Hero Section */}
         <Hero 
           title="BumiLestari"
-          subtitle="Marketplace Produk Ramah Lingkungan untuk Masa Depan Berkelanjutan"
-          ctaText="Jelajahi Produk Eco-Friendly"
+          subtitle="for your sustainable living"
+          ctaText="Explore Products"
         />
 
         {/* About Section */}
@@ -61,9 +55,9 @@ export const LandingPage = () => {
 
         {/* Featured Products Section */}
         <ProductSection 
-          title="Produk Pilihan Terbaik"
+          title="Products"
           showAll={false}
-          maxProducts={8}
+          maxProducts={3}
           categoryFilter="all"
         />
 
@@ -72,7 +66,7 @@ export const LandingPage = () => {
 
         {/* Newsletter Section */}
         <Newsletter />
-      </motion.main>
+      </main>
 
       {/* Footer */}
       <Footer />
@@ -82,9 +76,6 @@ export const LandingPage = () => {
         isVisible={isScrolled} 
         onClick={scrollToTop} 
       />
-
-      {/* Loading Spinner Overlay - Optional */}
-      {/* You can add a loading state here if needed */}
     </motion.div>
   );
 };
