@@ -19,7 +19,7 @@ export const AboutSection = () => {
       number: '03',
       title: 'Designed For Earth',
       description: 'BumiLestari hadir untuk memudahkan Anda menjalani gaya hidup berkelanjutan tanpa mengorbankan kualitas dan estetika. Bersama-sama kita ciptakan masa depan yang lebih hijau.',
-      image: 'https://images.unsplash.com/photo-1615486511262-2f3fa7c54c81?w=600'
+      image: 'https://static.tweaktown.com/news/1/0/101704_651651_microsoft-confirms-its-creating-new-ai-thats-trained-on-nasas-100-petabytes-of-earth-data_full.png'
     }
   ];
 
