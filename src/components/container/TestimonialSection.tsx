@@ -40,7 +40,7 @@ export const TestimonialSection = () => {
               className="text-4xl md:text-5xl font-bold text-gray-900"
               style={{ fontFamily: 'var(--font-heading)' }}
             >
-              Apa Kata<br />Pelanggan Kami
+              Apa Kata Pelanggan Kami?
             </h2>
           </div>
         </motion.div>
