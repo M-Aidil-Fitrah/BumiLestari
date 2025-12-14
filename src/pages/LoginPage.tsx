@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Eye, EyeOff, Mail, Lock, ArrowLeft, Leaf, Sparkles, Truck } from 'lucide-react';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -26,142 +28,185 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        {/* Header */}
-        <div className="text-center">
-          <Link to="/" className="inline-block">
-            <div className="flex items-center justify-center space-x-2 mb-6">
-              <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-sm">🌱</span>
-              </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-                BumiLestari
-              </span>
-            </div>
-          </Link>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Selamat Datang Kembali
-          </h2>
-          <p className="text-gray-600">
-            Masuk ke akun Anda untuk melanjutkan berbelanja produk ramah lingkungan
-          </p>
-        </div>
+    <div className="relative h-screen bg-[#F5F3EE] overflow-hidden">
+      {/* Back Button */}
+      <motion.button
+        onClick={() => navigate('/')}
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5 }}
+        className="absolute top-8 left-8 z-50 flex items-center gap-2 text-[#2C2C2C] hover:text-[#8B7355] transition-colors group"
+      >
+        <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+        <span className="font-medium">Kembali</span>
+      </motion.button>
 
-        {/* Login Form */}
-        <div className="bg-white rounded-xl shadow-lg p-8">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            {/* Email Field */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                value={formData.email}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
-                placeholder="Masukkan email Anda"
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-[#8B7355] rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#2C2C2C] rounded-full blur-3xl"></div>
+      </div>
+
+      {/* Main Content */}
+      <div className="relative h-full flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+          
+          {/* Left Side - Welcome Content */}
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+            className="hidden lg:block"
+          >
+            <div className="mb-8">
+              <img 
+                src="/BumiLestari.png" 
+                alt="BumiLestari Logo" 
+                className="max-w-[250px] h-auto object-contain mb-5"
               />
+              <h1 className="text-5xl font-bold text-[#2C2C2C] mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
+                Selamat Datang
+              </h1>
+              <p className="text-lg text-gray-600 leading-relaxed max-w-md" style={{ fontFamily: 'var(--font-body)' }}>
+                Masuk untuk melanjutkan perjalanan Anda menuju gaya hidup yang lebih berkelanjutan.
+              </p>
             </div>
-
-            {/* Password Field */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
-                  placeholder="Masukkan password Anda"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                >
-                  {showPassword ? '👁️' : '👁️‍🗨️'}
-                </button>
-              </div>
-            </div>
-
-            {/* Remember Me & Forgot Password */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                  Ingat saya
-                </label>
-              </div>
-              <Link to="/forgot-password" className="text-sm text-green-600 hover:text-green-500">
-                Lupa password?
-              </Link>
-            </div>
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 transform hover:scale-105"
-            >
-              Masuk
-            </button>
-
-            {/* Social Login */}
-            <div className="mt-6">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300" />
+            
+            {/* Feature Points */}
+            <div className="space-y-4 max-w-md">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#8B7355]/10 flex items-center justify-center flex-shrink-0">
+                  <Leaf className="w-5 h-5 text-[#8B7355]" />
                 </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500">Atau masuk dengan</span>
+                <span className="text-gray-700">Produk 100% Ramah Lingkungan</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#8B7355]/10 flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="w-5 h-5 text-[#8B7355]" />
                 </div>
+                <span className="text-gray-700">Kualitas Premium & Terpercaya</span>
               </div>
-
-              <div className="mt-6 grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-                >
-                  <span className="mr-2">🔍</span>
-                  Google
-                </button>
-                <button
-                  type="button"
-                  className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-                >
-                  <span className="mr-2">📘</span>
-                  Facebook
-                </button>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#8B7355]/10 flex items-center justify-center flex-shrink-0">
+                  <Truck className="w-5 h-5 text-[#8B7355]" />
+                </div>
+                <span className="text-gray-700">Pengiriman Cepat & Aman</span>
               </div>
             </div>
+          </motion.div>
 
-            {/* Register Link */}
-            <div className="text-center">
-              <span className="text-gray-600">Belum punya akun? </span>
-              <Link to="/register" className="text-green-600 hover:text-green-500 font-medium">
-                Daftar sekarang
-              </Link>
+          {/* Right Side - Login Form */}
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="w-full max-w-md mx-auto"
+          >
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-[#8B7355]/10">
+              {/* Header */}
+              <div className="text-center mb-6">
+                <h2 className="text-3xl font-bold text-[#2C2C2C] mb-2" style={{ fontFamily: 'var(--font-heading)' }}>
+                  Selamat Datang Kembali
+                </h2>
+                <p className="text-[#8B7355]">Masuk ke akun Anda</p>
+              </div>
+
+              <form className="space-y-5" onSubmit={handleSubmit}>
+                {/* Email Field */}
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-[#2C2C2C] mb-2">
+                    Email
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8B7355] w-5 h-5" />
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      required
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className="w-full pl-11 pr-4 py-3 border border-[#8B7355]/30 rounded-xl focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] transition-all bg-white/50"
+                      placeholder="nama@email.com"
+                    />
+                  </div>
+                </div>
+
+                {/* Password Field */}
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-[#2C2C2C] mb-2">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8B7355] w-5 h-5" />
+                    <input
+                      id="password"
+                      name="password"
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      className="w-full pl-11 pr-12 py-3 border border-[#8B7355]/30 rounded-xl focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] transition-all bg-white/50"
+                      placeholder="Masukkan password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#8B7355] hover:text-[#2C2C2C] transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Remember Me & Forgot Password */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <input
+                      id="remember-me"
+                      name="remember-me"
+                      type="checkbox"
+                      className="h-4 w-4 text-[#8B7355] focus:ring-[#8B7355] border-[#8B7355]/30 rounded"
+                    />
+                    <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                      Ingat saya
+                    </label>
+                  </div>
+                  <Link to="/forgot-password" className="text-sm text-[#8B7355] hover:text-[#2C2C2C] transition-colors">
+                    Lupa password?
+                  </Link>
+                </div>
+
+                {/* Submit Button */}
+                <motion.button
+                  type="submit"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full bg-[#2C2C2C] hover:bg-[#1a1a1a] text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
+                >
+                  Masuk
+                </motion.button>
+
+                {/* Register Link */}
+                <div className="text-center pt-4">
+                  <span className="text-gray-600">Belum punya akun? </span>
+                  <Link to="/register" className="text-[#8B7355] hover:text-[#2C2C2C] font-medium transition-colors">
+                    Daftar sekarang
+                  </Link>
+                </div>
+              </form>
             </div>
-          </form>
-        </div>
 
-        {/* Footer */}
-        <div className="text-center text-sm text-gray-500">
-          <p>Dengan masuk, Anda menyetujui <Link to="/terms" className="text-green-600 hover:underline">Syarat & Ketentuan</Link> dan <Link to="/privacy" className="text-green-600 hover:underline">Kebijakan Privasi</Link> kami</p>
+            {/* Footer Text */}
+            <div className="text-center text-xs text-gray-500 mt-6">
+              <p>
+                Dengan masuk, Anda menyetujui{' '}
+                <Link to="/terms" className="text-[#8B7355] hover:underline">Syarat & Ketentuan</Link>
+                {' '}dan{' '}
+                <Link to="/privacy" className="text-[#8B7355] hover:underline">Kebijakan Privasi</Link>
+              </p>
+            </div>
+          </motion.div>
         </div>
       </div>
     </div>
