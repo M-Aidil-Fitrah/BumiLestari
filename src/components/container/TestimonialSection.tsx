@@ -8,7 +8,7 @@ export const TestimonialSection = () => {
       quote: "Kualitasnya luar biasa, dari tekstur hingga desainnya. Setiap detail terasa sangat diperhatikan. Ini benar-benar mengubah rutinitas malam saya!",
       author: "Ela Soleha",
       bgColor: 'bg-[#F5F3EE]',
-      image: '/images/avatar1.svg'
+      image: '/images/avatar1.jpg'
     },
     {
       id: 2,
@@ -16,14 +16,14 @@ export const TestimonialSection = () => {
       author: "Sarah Putri",
       bgColor: 'bg-[#2C2C2C]',
       textColor: 'text-white',
-      image: '/images/avatar2.svg'
+      image: '/images/avatar2.jpg'
     },
     {
       id: 3,
       quote: "Setiap produk menceritakan kisah kerajinan dan perhatian. Aroma alaminya luar biasa, dan saya merasa senang mengetahui mereka ramah lingkungan.",
       author: "Budi Santoso",
       bgColor: 'bg-[#F5F3EE]',
-      image: '/images/avatar3.svg'
+      image: '/images/avatar3.jpg'
     }
   ];
 
