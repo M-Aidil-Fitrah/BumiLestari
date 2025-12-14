@@ -68,7 +68,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
           )}
           {product.rating >= 4.8 && (
             <span className="bg-[#8B7355] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-              Featured
+              Terbaik
             </span>
           )}
         </div>
