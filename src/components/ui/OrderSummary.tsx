@@ -1,6 +1,6 @@
 import React from 'react';
 import { Sparkles, Truck } from 'lucide-react';
-import type { Product } from '../../data/products';
+import type { Product } from '@/lib/supabase';
 
 export interface OrderItem {
   product: Product;

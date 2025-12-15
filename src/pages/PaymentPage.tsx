@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { productService } from '@/lib/products';
-import type { Product } from '@/lib/supabase';
 import PaymentMethod from '../components/ui/PaymentMethod';
 import OrderSummary, { type OrderItem } from '../components/ui/OrderSummary';
 import PaymentForm, { type CustomerData } from '../components/ui/PaymentForm';

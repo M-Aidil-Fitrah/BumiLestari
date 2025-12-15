@@ -1,6 +1,6 @@
 // src/components/admin/EditProductModal.tsx
 import { useState, useEffect } from 'react';
-import { X, Upload } from 'lucide-react';
+import { X } from 'lucide-react';
 import { adminService } from '@/lib/admin';
 import type { Product, Category } from '@/lib/supabase';
 

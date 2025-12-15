@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { dummyProducts } from '../../data/products';
-import type { Product } from '../../data/products';
+import type { Product } from '@/lib/supabase';
 import { ArrowRight, Star, ShoppingBag } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface ProductSectionProps {
   title?: string;
@@ -16,12 +16,17 @@ export const ProductSection = ({
   maxProducts = 3,
 }: ProductSectionProps) => {
   const navigate = useNavigate();
+  const [featuredProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    // TODO: Fetch products from your API/database
+    // const products = await fetchProducts();
+    // setFeaturedProducts(products.slice(0, maxProducts));
+  }, [maxProducts]);
 
   const handleProductClick = (product: Product) => {
     navigate(`/marketplace/product/${product.id}`);
   };
-
-  const featuredProducts = dummyProducts.slice(0, maxProducts);
 
   return (
     <section className="py-20 bg-[#1a1a1a] relative overflow-hidden">

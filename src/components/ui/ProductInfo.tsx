@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Leaf, Truck, RotateCcw, CheckCircle } from 'lucide-react';
-import type { Product } from '../../data/products';
+import type { Product } from '@/lib/supabase';
 
 interface ProductInfoProps {
   product: Product;
@@ -94,7 +94,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, onAddToCart, onBuyNo
             <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
             <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
           </svg>
-          <span className="font-medium">{product.reviews} ulasan</span>
+<span className="font-medium">{product.reviews_count || 0} ulasan</span>
         </div>
         <div className="flex items-center text-gray-600">
           <svg className="w-5 h-5 mr-1.5 text-[#8B7355]" fill="currentColor" viewBox="0 0 20 20">

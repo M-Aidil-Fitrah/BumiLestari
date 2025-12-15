@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Product } from '../../data/products';
+import type { Product } from '@/lib/supabase';
 
 interface ProductCardProps {
   product: Product;
@@ -98,8 +98,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
           <div className="flex items-center">
             {renderStars(product.rating)}
           </div>
-          <span className="text-xs text-gray-500">
-            ({product.reviews})
+            <span className="text-xs text-gray-500">
+              ({product.reviews?.length || 0})
           </span>
         </div>
 

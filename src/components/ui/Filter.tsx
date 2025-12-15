@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { categories } from '../../data/products';
+// src/components/ui/Filter.tsx
+import React, { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
+import type { Category } from '@/lib/supabase';
 
 export interface FilterOptions {
-  category: string;
+  category: string; // Ini akan menyimpan category_id atau 'all'
   minPrice: number;
   maxPrice: number;
   minRating: number;
@@ -16,14 +18,49 @@ interface FilterProps {
 
 const Filter: React.FC<FilterProps> = ({ onFilterChange, className = "" }) => {
   const [filters, setFilters] = useState<FilterOptions>({
-    category: 'Semua Kategori',
+    category: 'all', // Ubah dari 'Semua Kategori' menjadi 'all'
     minPrice: 0,
     maxPrice: 1000000,
     minRating: 0,
     sortBy: 'name'
   });
 
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
+
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  const loadCategories = async () => {
+  setLoading(true);
+  try {
+    const { data, error } = await supabase
+      .from('categories')
+      .select('id, name, slug, description, image_url, created_at')
+      .order('name');
+
+    if (error) throw error;
+    
+    if (data) {
+      // Map data untuk memenuhi interface Category
+      const mappedCategories = data.map(cat => ({
+        id: cat.id,
+        name: cat.name,
+        slug: cat.slug,
+        description: cat.description || null,
+        image_url: cat.image_url || null,
+        created_at: cat.created_at || new Date().toISOString()
+      }));
+      setCategories(mappedCategories);
+    }
+  } catch (error) {
+    console.error('Error loading categories:', error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleFilterChange = (key: keyof FilterOptions, value: any) => {
     const newFilters = { ...filters, [key]: value };
@@ -33,7 +70,7 @@ const Filter: React.FC<FilterProps> = ({ onFilterChange, className = "" }) => {
 
   const resetFilters = () => {
     const defaultFilters: FilterOptions = {
-      category: 'Semua Kategori',
+      category: 'all',
       minPrice: 0,
       maxPrice: 1000000,
       minRating: 0,
@@ -55,6 +92,7 @@ const Filter: React.FC<FilterProps> = ({ onFilterChange, className = "" }) => {
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           className="p-2 rounded-lg hover:bg-[#8B7355]/10 text-[#8B7355] transition-colors"
+          aria-label={isExpanded ? "Sembunyikan filter" : "Tampilkan filter"}
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isExpanded ? "M5 15l7-7 7 7" : "M19 9l-7 7-7-7"} />
@@ -72,13 +110,18 @@ const Filter: React.FC<FilterProps> = ({ onFilterChange, className = "" }) => {
             value={filters.category}
             onChange={(e) => handleFilterChange('category', e.target.value)}
             className="w-full p-3 bg-white border border-[#8B7355]/30 rounded-xl focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] outline-none transition-all font-medium text-[#2C2C2C]"
+            disabled={loading}
           >
-            {categories.map((category) => (
-              <option key={category} value={category}>
-                {category}
+            <option value="all">Semua Kategori</option>
+            {categories.map((category: Category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
               </option>
             ))}
           </select>
+          {loading && (
+            <p className="text-xs text-gray-500 mt-1">Memuat kategori...</p>
+          )}
         </div>
 
         {/* Price Range Filter */}
@@ -87,20 +130,28 @@ const Filter: React.FC<FilterProps> = ({ onFilterChange, className = "" }) => {
             Harga
           </label>
           <div className="grid grid-cols-2 gap-2">
-            <input
-              type="number"
-              placeholder="Min"
-              value={filters.minPrice}
-              onChange={(e) => handleFilterChange('minPrice', Number(e.target.value))}
-              className="p-3 bg-white border border-[#8B7355]/30 rounded-xl focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] outline-none transition-all font-medium text-[#2C2C2C]"
-            />
-            <input
-              type="number"
-              placeholder="Max"
-              value={filters.maxPrice}
-              onChange={(e) => handleFilterChange('maxPrice', Number(e.target.value))}
-              className="p-3 bg-white border border-[#8B7355]/30 rounded-xl focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] outline-none transition-all font-medium text-[#2C2C2C]"
-            />
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">Rp</span>
+              <input
+                type="number"
+                placeholder="Min"
+                value={filters.minPrice}
+                onChange={(e) => handleFilterChange('minPrice', Number(e.target.value))}
+                className="w-full pl-10 pr-3 py-3 bg-white border border-[#8B7355]/30 rounded-xl focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] outline-none transition-all font-medium text-[#2C2C2C]"
+                min="0"
+              />
+            </div>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">Rp</span>
+              <input
+                type="number"
+                placeholder="Max"
+                value={filters.maxPrice}
+                onChange={(e) => handleFilterChange('maxPrice', Number(e.target.value))}
+                className="w-full pl-10 pr-3 py-3 bg-white border border-[#8B7355]/30 rounded-xl focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] outline-none transition-all font-medium text-[#2C2C2C]"
+                min="0"
+              />
+            </div>
           </div>
         </div>
 
@@ -144,11 +195,12 @@ const Filter: React.FC<FilterProps> = ({ onFilterChange, className = "" }) => {
           <button
             onClick={resetFilters}
             className="w-full bg-[#2C2C2C] hover:bg-[#1a1a1a] text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 shadow-sm hover:shadow-lg flex items-center justify-center gap-2"
+            disabled={loading}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
-            Reset
+            Reset Filter
           </button>
         </div>
       </div>

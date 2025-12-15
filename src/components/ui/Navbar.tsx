@@ -1,6 +1,6 @@
 // src/components/ui/Navbar.tsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { StaggeredMenu } from './StaggeredMenu';
 import type { StaggeredMenuItem, StaggeredMenuSocialItem } from './StaggeredMenu';
 import { authService } from '@/lib/auth';
@@ -10,11 +10,10 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ isScrolled }) => {
-  const navigate = useNavigate();
   const location = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [userName, setUserName] = useState('');
+  const [, setUserName] = useState('');
 
   // Re-check auth status setiap kali route berubah
   useEffect(() => {
