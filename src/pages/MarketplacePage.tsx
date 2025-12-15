@@ -1,8 +1,9 @@
-import React, { useState, useMemo } from 'react';
+// src/pages/MarketplacePage.tsx
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { dummyProducts } from '../data/products';
-import type { Product } from '../data/products';
+import { productService } from '@/lib/products';
+import type { Product } from '@/lib/supabase';
 import SearchBar from '../components/ui/SearchBar';
 import type { FilterOptions } from '../components/ui/Filter';
 import ProductCardMarketplace from '../components/ui/ProductCardMarketplace';
@@ -12,6 +13,8 @@ import { Footer } from '../components/ui/Footer';
 
 const MarketplacePage: React.FC = () => {
   const navigate = useNavigate();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState<FilterOptions>({
     category: 'Semua Kategori',
@@ -23,17 +26,33 @@ const MarketplacePage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
+  // Load products from database
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+  const loadProducts = async () => {
+    setLoading(true);
+    try {
+      const data = await productService.getProducts();
+      setProducts(data);
+    } catch (error) {
+      console.error('Error loading products:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Filter and search products
   const filteredProducts = useMemo(() => {
-    let filtered = dummyProducts.filter((product) => {
+    let filtered = products.filter((product) => {
       // Search filter
       const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            product.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
 
-      // Category filter
-      const matchesCategory = filters.category === 'Semua Kategori' || product.category === filters.category;
+      // Category filter (you'll need to join with categories table)
+      const matchesCategory = filters.category === 'Semua Kategori'; // Simplified for now
 
       // Price filter
       const matchesPrice = product.price >= filters.minPrice && product.price <= filters.maxPrice;
@@ -56,14 +75,14 @@ const MarketplacePage: React.FC = () => {
         case 'rating':
           return b.rating - a.rating;
         case 'newest':
-          return b.id.localeCompare(a.id); // Assuming higher ID means newer
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
         default:
           return 0;
       }
     });
 
     return filtered;
-  }, [searchTerm, filters]);
+  }, [products, searchTerm, filters]);
 
   // Pagination
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
@@ -244,94 +263,98 @@ const MarketplacePage: React.FC = () => {
           )}
         </div>
 
-        {/* Products Grid */}
-        {currentProducts.length === 0 ? (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-center py-20 bg-white/80 backdrop-blur-sm rounded-3xl border border-[#8B7355]/20"
-              >
-                <div className="mb-6">
-                  <svg className="mx-auto h-32 w-32 text-[#8B7355]/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                  </svg>
-                </div>
-                <h3 className="text-2xl font-bold text-[#2C2C2C] mb-3" style={{ fontFamily: 'var(--font-heading)' }}>
-                  Tidak ada produk ditemukan
-                </h3>
-                <p className="text-gray-600 mb-6 max-w-md mx-auto" style={{ fontFamily: 'var(--font-body)' }}>
-                  Coba ubah kriteria pencarian atau filter untuk menemukan produk yang sesuai
-                </p>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => {
-                    setSearchTerm('');
-                    setFilters({
-                      category: 'Semua Kategori',
-                      minPrice: 0,
-                      maxPrice: 1000000,
-                      minRating: 0,
-                      sortBy: 'name'
-                    });
-                  }}
-                  className="bg-[#2C2C2C] hover:bg-[#1a1a1a] text-white font-semibold py-3 px-8 rounded-xl transition-all duration-300 shadow-lg inline-flex items-center gap-2"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                  Reset Semua Filter
-                </motion.button>
-              </motion.div>
-            ) : (
-              <>
+        {/* Loading State */}
+        {loading ? (
+          <div className="text-center py-20">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#8B7355] border-t-transparent"></div>
+            <p className="mt-4 text-gray-600">Memuat produk...</p>
+          </div>
+        ) : currentProducts.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center py-20 bg-white/80 backdrop-blur-sm rounded-3xl border border-[#8B7355]/20"
+          >
+            <div className="mb-6">
+              <svg className="mx-auto h-32 w-32 text-[#8B7355]/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+              </svg>
+            </div>
+            <h3 className="text-2xl font-bold text-[#2C2C2C] mb-3" style={{ fontFamily: 'var(--font-heading)' }}>
+              Tidak ada produk ditemukan
+            </h3>
+            <p className="text-gray-600 mb-6 max-w-md mx-auto" style={{ fontFamily: 'var(--font-body)' }}>
+              Coba ubah kriteria pencarian atau filter untuk menemukan produk yang sesuai
+            </p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                setSearchTerm('');
+                setFilters({
+                  category: 'Semua Kategori',
+                  minPrice: 0,
+                  maxPrice: 1000000,
+                  minRating: 0,
+                  sortBy: 'name'
+                });
+              }}
+              className="bg-[#2C2C2C] hover:bg-[#1a1a1a] text-white font-semibold py-3 px-8 rounded-xl transition-all duration-300 shadow-lg inline-flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Reset Semua Filter
+            </motion.button>
+          </motion.div>
+        ) : (
+          <>
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: {},
+                visible: {
+                  transition: {
+                    staggerChildren: 0.05
+                  }
+                }
+              }}
+              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 mb-8"
+            >
+              {currentProducts.map((product) => (
                 <motion.div
-                  initial="hidden"
-                  animate="visible"
+                  key={product.id}
                   variants={{
-                    hidden: {},
-                    visible: {
-                      transition: {
-                        staggerChildren: 0.05
-                      }
-                    }
+                    hidden: { opacity: 0, y: 20 },
+                    visible: { opacity: 1, y: 0 }
                   }}
-                  className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 mb-8"
                 >
-                  {currentProducts.map((product) => (
-                    <motion.div
-                      key={product.id}
-                      variants={{
-                        hidden: { opacity: 0, y: 20 },
-                        visible: { opacity: 1, y: 0 }
-                      }}
-                    >
-                      <ProductCardMarketplace
-                        product={product}
-                        onClick={handleProductClick}
-                      />
-                    </motion.div>
-                  ))}
-                </motion.div>
-
-                {/* Pagination */}
-                <div className="relative z-30 mt-8">
-                  <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    totalItems={filteredProducts.length}
-                    itemsPerPage={itemsPerPage}
-                    onPageChange={handlePageChange}
+                  <ProductCardMarketplace
+                    product={product}
+                    onClick={handleProductClick}
                   />
-                </div>
-              </>
-            )}
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {/* Pagination */}
+            <div className="relative z-30 mt-8">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={filteredProducts.length}
+                itemsPerPage={itemsPerPage}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          </>
+        )}
       </div>
 
       <Footer />
     </div>
   );
-
 };
 
 export default MarketplacePage;

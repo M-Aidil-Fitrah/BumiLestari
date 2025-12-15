@@ -1,6 +1,8 @@
+// src/pages/PaymentPage.tsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { dummyProducts } from '../data/products';
+import { productService } from '@/lib/products';
+import type { Product } from '@/lib/supabase';
 import PaymentMethod from '../components/ui/PaymentMethod';
 import OrderSummary, { type OrderItem } from '../components/ui/OrderSummary';
 import PaymentForm, { type CustomerData } from '../components/ui/PaymentForm';
@@ -34,17 +36,33 @@ const PaymentPage: React.FC = () => {
 
   // Initialize order data from navigation state or URL params
   useEffect(() => {
+    loadOrderData();
+  }, [location, navigate]);
+
+  const loadOrderData = async () => {
+    setIsLoading(true);
+    
     const state = location.state as { productId?: string; quantity?: number } | null;
     
     if (state?.productId) {
-      const product = dummyProducts.find(p => p.id === state.productId);
-      if (product) {
-        setOrderItems([{
-          product,
-          quantity: state.quantity || 1
-        }]);
-      } else {
-        // Product not found, redirect to marketplace
+      try {
+        // Fetch product from database
+        const product = await productService.getProduct(state.productId);
+        
+        if (product) {
+          setOrderItems([{
+            product,
+            quantity: state.quantity || 1
+          }]);
+        } else {
+          // Product not found, redirect to marketplace
+          alert('Produk tidak ditemukan');
+          navigate('/marketplace');
+          return;
+        }
+      } catch (error) {
+        console.error('Error loading product:', error);
+        alert('Gagal memuat data produk');
         navigate('/marketplace');
         return;
       }
@@ -55,7 +73,7 @@ const PaymentPage: React.FC = () => {
     }
     
     setIsLoading(false);
-  }, [location, navigate]);
+  };
 
   // Calculate payment fee based on selected method
   const getPaymentFee = () => {
@@ -85,12 +103,24 @@ const PaymentPage: React.FC = () => {
       return;
     }
 
+    // TODO: Integrate with backend to save order
+    // Example:
+    // await orderService.createOrder({
+    //   items: orderItems,
+    //   customerData,
+    //   paymentMethod: selectedPaymentMethod,
+    //   shippingCost: 0,
+    //   paymentFee: getPaymentFee()
+    // });
+
     // Simulate payment processing
     setShowSuccessModal(true);
   };
 
   const handleModalClose = () => {
     setShowSuccessModal(false);
+    // Redirect to home or order history
+    navigate('/');
   };
 
   // Show loading state

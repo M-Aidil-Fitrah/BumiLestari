@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
+// src/components/ui/ReviewSection.tsx
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { dummyReviews } from '../../data/reviews';
+import { Star, ThumbsUp, MessageSquare } from 'lucide-react';
+import { reviewService } from '@/lib/reviews';
+import { authService } from '@/lib/auth';
+import type { Review } from '@/lib/supabase';
 
 interface ReviewSectionProps {
   productId: string;
@@ -8,208 +12,346 @@ interface ReviewSectionProps {
   totalReviews: number;
 }
 
-const ReviewSection: React.FC<ReviewSectionProps> = ({ productId, productRating, totalReviews }) => {
-  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'highest' | 'lowest'>('newest');
+const ReviewSection: React.FC<ReviewSectionProps> = ({
+  productId,
+  productRating,
+  totalReviews,
+}) => {
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   
-  // Filter reviews for this product
-  const productReviews = dummyReviews.filter(review => review.productId === productId);
-
-  // Sort reviews
-  const sortedReviews = [...productReviews].sort((a, b) => {
-    switch (sortBy) {
-      case 'newest':
-        return new Date(b.date).getTime() - new Date(a.date).getTime();
-      case 'oldest':
-        return new Date(a.date).getTime() - new Date(b.date).getTime();
-      case 'highest':
-        return b.rating - a.rating;
-      case 'lowest':
-        return a.rating - b.rating;
-      default:
-        return 0;
-    }
+  const [reviewForm, setReviewForm] = useState({
+    rating: 5,
+    comment: '',
   });
 
-  const renderStars = (rating: number) => {
-    const stars = [];
-    for (let i = 1; i <= 5; i++) {
-      stars.push(
-        <span key={i} className={`text-lg ${i <= rating ? 'text-yellow-400' : 'text-gray-300'}`}>
-          ★
-        </span>
-      );
+  useEffect(() => {
+    loadReviews();
+    checkLoginStatus();
+  }, [productId]);
+
+  const checkLoginStatus = async () => {
+    const user = await authService.getCurrentUser();
+    setIsLoggedIn(!!user);
+  };
+
+  const loadReviews = async () => {
+    setLoading(true);
+    try {
+      const data = await reviewService.getProductReviews(productId);
+      setReviews(data);
+    } catch (error) {
+      console.error('Error loading reviews:', error);
+    } finally {
+      setLoading(false);
     }
-    return stars;
+  };
+
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!isLoggedIn) {
+      alert('Silakan login terlebih dahulu untuk memberikan ulasan');
+      return;
+    }
+
+    if (reviewForm.comment.trim().length < 10) {
+      alert('Ulasan minimal 10 karakter');
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      await reviewService.addReview({
+        product_id: productId,
+        rating: reviewForm.rating,
+        comment: reviewForm.comment,
+      });
+
+      alert('Ulasan berhasil ditambahkan!');
+      
+      // Reset form
+      setReviewForm({ rating: 5, comment: '' });
+      setShowReviewForm(false);
+      
+      // Reload reviews
+      loadReviews();
+    } catch (error: any) {
+      alert('Gagal menambahkan ulasan: ' + error.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const renderStars = (rating: number, interactive: boolean = false) => {
+    return (
+      <div className="flex gap-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            key={star}
+            type={interactive ? 'button' : undefined}
+            disabled={!interactive}
+            onClick={() => interactive && setReviewForm({ ...reviewForm, rating: star })}
+            className={`${interactive ? 'cursor-pointer hover:scale-110' : 'cursor-default'} transition-transform`}
+            aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
+          >
+            <Star
+              className={`w-5 h-5 ${
+                star <= rating
+                  ? 'fill-yellow-400 text-yellow-400'
+                  : 'fill-gray-200 text-gray-200'
+              }`}
+            />
+          </button>
+        ))}
+      </div>
+    );
   };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('id-ID', {
+    return new Intl.DateTimeFormat('id-ID', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
-    });
+      day: 'numeric',
+    }).format(date);
   };
 
-  const getRatingDistribution = () => {
-    const distribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-    productReviews.forEach(review => {
-      distribution[review.rating as keyof typeof distribution]++;
-    });
-    return distribution;
-  };
-
-  const ratingDistribution = getRatingDistribution();
+  // Calculate rating distribution
+  const ratingDistribution = [5, 4, 3, 2, 1].map((rating) => {
+    const count = reviews.filter((r) => Math.floor(r.rating) === rating).length;
+    const percentage = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
+    return { rating, count, percentage };
+  });
 
   return (
     <div className="space-y-8">
-      {/* Rating Summary */}
-      <div className="bg-gradient-to-br from-[#8B7355]/5 to-[#8B7355]/10 p-8 rounded-2xl border border-[#8B7355]/20">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Overall Rating */}
-          <div className="flex items-center space-x-6">
-            <div className="text-center bg-white rounded-2xl p-6 shadow-lg">
-              <div className="text-5xl font-bold text-[#8B7355] mb-2">{productRating}</div>
-              <div className="flex justify-center mb-2">
-                {renderStars(Math.round(productRating))}
+      {/* Rating Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-8 border-b">
+        {/* Average Rating */}
+        <div className="text-center md:text-left">
+          <div className="flex items-center justify-center md:justify-start gap-4 mb-4">
+            <div className="text-6xl font-bold text-[#2C2C2C]">{productRating.toFixed(1)}</div>
+            <div>
+              <div className="flex gap-1 mb-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star
+                    key={star}
+                    className={`w-6 h-6 ${
+                      star <= Math.round(productRating)
+                        ? 'fill-yellow-400 text-yellow-400'
+                        : 'fill-gray-200 text-gray-200'
+                    }`}
+                  />
+                ))}
               </div>
-              <div className="text-sm text-gray-600 font-medium">{totalReviews} ulasan</div>
-            </div>
-            <div className="flex-1">
-              <div className="text-lg font-bold text-[#2C2C2C] mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
-                Rating Pembeli
-              </div>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Produk ini mendapat rating tinggi dari pembeli yang puas dengan kualitas dan pelayanan kami.
+              <p className="text-gray-600">
+                Berdasarkan {totalReviews} ulasan
               </p>
             </div>
           </div>
+        </div>
 
-          {/* Rating Distribution */}
-          <div className="space-y-3">
-            {[5, 4, 3, 2, 1].map((star) => {
-              const count = ratingDistribution[star as keyof typeof ratingDistribution];
-              const percentage = productReviews.length > 0 ? (count / productReviews.length) * 100 : 0;
-              
-              return (
-                <div key={star} className="flex items-center gap-3">
-                  <div className="flex items-center gap-1 w-16">
-                    <span className="text-sm font-semibold text-[#2C2C2C] w-3">{star}</span>
-                    <span className="text-yellow-400 text-sm">★</span>
-                  </div>
-                  <div className="flex-1 bg-gray-200 rounded-full h-3 overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${percentage}%` }}
-                      transition={{ duration: 0.8, delay: star * 0.1 }}
-                      className="bg-gradient-to-r from-[#8B7355] to-[#6d5942] h-3 rounded-full"
-                    ></motion.div>
-                  </div>
-                  <span className="text-sm text-gray-600 font-medium w-12 text-right">
-                    {count}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
+        {/* Rating Distribution */}
+        <div className="space-y-2">
+          {ratingDistribution.map(({ rating, count, percentage }) => (
+            <div key={rating} className="flex items-center gap-3">
+              <span className="text-sm font-medium text-gray-600 w-8">
+                {rating} ★
+              </span>
+              <div className="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-yellow-400 transition-all duration-500"
+                  style={{ width: `${percentage}%` }}
+                  role="progressbar"
+                  aria-valuenow={percentage}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                />
+              </div>
+              <span className="text-sm text-gray-600 w-8 text-right">{count}</span>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Sort Options */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <h3 className="text-2xl font-bold text-[#2C2C2C]" style={{ fontFamily: 'var(--font-heading)' }}>
-          Semua Ulasan <span className="text-[#8B7355]">({productReviews.length})</span>
-        </h3>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600 font-medium">Urutkan:</span>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-            className="px-4 py-2 bg-white border-2 border-gray-200 rounded-full focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] outline-none text-sm font-medium text-gray-700 cursor-pointer hover:border-[#8B7355]/50 transition-colors"
+      {/* Write Review Button */}
+      {isLoggedIn && !showReviewForm && (
+        <div className="text-center">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setShowReviewForm(true)}
+            className="inline-flex items-center gap-2 bg-[#8B7355] hover:bg-[#7a6349] text-white font-semibold py-3 px-8 rounded-xl transition-all duration-300 shadow-lg"
           >
-            <option value="newest">Terbaru</option>
-            <option value="oldest">Terlama</option>
-            <option value="highest">Rating Tertinggi</option>
-            <option value="lowest">Rating Terendah</option>
-          </select>
+            <MessageSquare className="w-5 h-5" />
+            Tulis Ulasan
+          </motion.button>
         </div>
-      </div>
+      )}
+
+      {/* Review Form */}
+      {showReviewForm && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-[#F5F3EE] rounded-2xl p-6 border border-[#8B7355]/20"
+        >
+          <h3 className="text-xl font-bold text-[#2C2C2C] mb-4">
+            Tulis Ulasan Anda
+          </h3>
+          
+          <form onSubmit={handleSubmitReview} className="space-y-4">
+            {/* Rating */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Rating *
+              </label>
+              {renderStars(reviewForm.rating, true)}
+            </div>
+
+            {/* Comment */}
+            <div>
+              <label htmlFor="review-comment" className="block text-sm font-medium text-gray-700 mb-2">
+                Ulasan * (minimal 10 karakter)
+              </label>
+              <textarea
+                id="review-comment"
+                required
+                rows={5}
+                value={reviewForm.comment}
+                onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })}
+                placeholder="Bagikan pengalaman Anda dengan produk ini..."
+                className="w-full px-4 py-3 border border-[#8B7355]/30 rounded-xl focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] outline-none transition-all resize-none"
+              />
+              <p className="text-sm text-gray-500 mt-1">
+                {reviewForm.comment.length} karakter
+              </p>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowReviewForm(false);
+                  setReviewForm({ rating: 5, comment: '' });
+                }}
+                disabled={submitting}
+                className="flex-1 bg-gray-200 text-gray-800 py-3 rounded-xl hover:bg-gray-300 transition-colors disabled:opacity-50"
+              >
+                Batal
+              </button>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="flex-1 bg-[#2C2C2C] text-white py-3 rounded-xl hover:bg-[#1a1a1a] transition-colors disabled:opacity-50"
+              >
+                {submitting ? 'Mengirim...' : 'Kirim Ulasan'}
+              </button>
+            </div>
+          </form>
+        </motion.div>
+      )}
+
+      {/* Login Prompt for Non-logged users */}
+      {!isLoggedIn && (
+        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 text-center">
+          <p className="text-gray-700 mb-3">
+            Silakan login untuk memberikan ulasan produk
+          </p>
+          <a
+            href="/login"
+            className="inline-block bg-[#8B7355] hover:bg-[#7a6349] text-white font-semibold py-2 px-6 rounded-xl transition-colors"
+          >
+            Login Sekarang
+          </a>
+        </div>
+      )}
 
       {/* Reviews List */}
-      <div className="space-y-4">
-        {sortedReviews.length === 0 ? (
-          <div className="text-center py-16 bg-gray-50 rounded-2xl">
-            <div className="text-gray-400 mb-4">
-              <svg className="w-20 h-20 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-              </svg>
-            </div>
-            <p className="text-gray-500 text-lg font-medium">Belum ada ulasan untuk produk ini</p>
-            <p className="text-gray-400 text-sm mt-2">Jadilah yang pertama memberikan ulasan</p>
+      <div className="space-y-6">
+        <h3 className="text-2xl font-bold text-[#2C2C2C]">
+          Ulasan Pelanggan ({reviews.length})
+        </h3>
+
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-[#8B7355] border-t-transparent"></div>
+            <p className="mt-4 text-gray-600">Memuat ulasan...</p>
+          </div>
+        ) : reviews.length === 0 ? (
+          <div className="text-center py-12 bg-gray-50 rounded-2xl">
+            <MessageSquare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <p className="text-gray-500 text-lg">
+              Belum ada ulasan untuk produk ini
+            </p>
+            <p className="text-gray-400 text-sm mt-2">
+              Jadilah yang pertama memberikan ulasan!
+            </p>
           </div>
         ) : (
-          sortedReviews.map((review, index) => (
+          reviews.map((review, index) => (
             <motion.div
               key={review.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-shadow duration-300"
+              className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-md transition-shadow"
             >
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-start space-x-4 flex-1">
-                  <div className="w-12 h-12 bg-gradient-to-br from-[#8B7355] to-[#6d5942] rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0 shadow-md">
-                    {review.userName.charAt(0)}
+              {/* Header */}
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  {/* Avatar */}
+                  <div className="w-12 h-12 bg-[#8B7355] rounded-full flex items-center justify-center text-white font-bold text-lg">
+                    {review.user_name?.charAt(0).toUpperCase() || 'U'}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center flex-wrap gap-2 mb-2">
-                      <span className="font-bold text-[#2C2C2C] text-lg">{review.userName}</span>
+                  
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-semibold text-[#2C2C2C]">
+                        {review.user_name || 'User'}
+                      </h4>
                       {review.verified && (
-                        <span className="bg-[#8B7355] text-white text-xs px-3 py-1 rounded-full font-semibold flex items-center gap-1">
-                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                          </svg>
-                          Terverifikasi
+                        <span className="bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded-full">
+                          ✓ Verified
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center flex-wrap gap-3 text-sm">
-                      <div className="flex items-center">
-                        {renderStars(review.rating)}
-                      </div>
-                      <span className="text-gray-400">•</span>
-                      <span className="text-gray-500">{formatDate(review.date)}</span>
-                    </div>
+                    <p className="text-sm text-gray-500">
+                      {formatDate(review.created_at)}
+                    </p>
                   </div>
                 </div>
+
+                {/* Rating */}
+                {renderStars(review.rating)}
               </div>
 
-              <p className="text-gray-700 leading-relaxed text-base mb-4">{review.comment}</p>
+              {/* Comment */}
+              <p className="text-gray-700 leading-relaxed mb-4">
+                {review.comment}
+              </p>
 
-              <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                <button className="flex items-center space-x-2 text-gray-500 hover:text-[#8B7355] transition-colors group">
-                  <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-                  </svg>
-                  <span className="font-medium">Membantu ({review.helpful})</span>
-                </button>
-                <button className="text-gray-500 hover:text-[#8B7355] transition-colors font-medium text-sm">
-                  Balas
-                </button>
-              </div>
+              {/* Helpful Button */}
+              <button
+                className="flex items-center gap-2 text-sm text-gray-600 hover:text-[#8B7355] transition-colors"
+                onClick={() => {
+                  console.log('Helpful clicked for review:', review.id);
+                }}
+                aria-label={`Mark review as helpful (currently ${review.helpful || 0} helpful)`}
+              >
+                <ThumbsUp className="w-4 h-4" />
+                <span>Membantu ({review.helpful || 0})</span>
+              </button>
             </motion.div>
           ))
         )}
       </div>
-
-      {/* Load More Button */}
-      {sortedReviews.length > 0 && sortedReviews.length >= 3 && (
-        <div className="text-center pt-4">
-          <button className="bg-white hover:bg-gray-50 text-[#8B7355] font-bold py-3 px-8 rounded-full border-2 border-[#8B7355] transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
-            Lihat Ulasan Lainnya
-          </button>
-        </div>
-      )}
     </div>
   );
 };

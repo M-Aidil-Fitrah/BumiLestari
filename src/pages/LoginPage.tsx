@@ -1,7 +1,9 @@
+// pages/LoginPage.tsx
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, Mail, Lock, ArrowLeft, Leaf, Sparkles, Truck } from 'lucide-react';
+import { authService } from '@/lib/auth';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -10,6 +12,8 @@ const LoginPage = () => {
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -17,14 +21,34 @@ const LoginPage = () => {
       ...prev,
       [name]: value
     }));
+    // Clear error saat user mulai mengetik
+    if (error) setError('');
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Static login - untuk demo sementara
-    console.log('Login attempt:', formData);
-    alert('Login berhasil! (Demo)');
-    navigate('/');
+    setError('');
+    setLoading(true);
+
+    try {
+      await authService.signIn(formData.email, formData.password);
+      
+      // Login berhasil
+      navigate('/');
+    } catch (err: any) {
+      console.error('Login error:', err);
+      
+      // Handle berbagai error dari Supabase
+      if (err.message.includes('Invalid login credentials')) {
+        setError('Email atau password salah');
+      } else if (err.message.includes('Email not confirmed')) {
+        setError('Silakan verifikasi email Anda terlebih dahulu');
+      } else {
+        setError(err.message || 'Terjadi kesalahan saat login');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -111,6 +135,17 @@ const LoginPage = () => {
                 <p className="text-[#8B7355]">Masuk ke akun Anda</p>
               </div>
 
+              {/* Error Message */}
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm"
+                >
+                  {error}
+                </motion.div>
+              )}
+
               <form className="space-y-5" onSubmit={handleSubmit}>
                 {/* Email Field */}
                 <div>
@@ -126,7 +161,8 @@ const LoginPage = () => {
                       required
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="w-full pl-11 pr-4 py-3 border border-[#8B7355]/30 rounded-xl focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] transition-all bg-white/50"
+                      disabled={loading}
+                      className="w-full pl-11 pr-4 py-3 border border-[#8B7355]/30 rounded-xl focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] transition-all bg-white/50 disabled:opacity-50 disabled:cursor-not-allowed"
                       placeholder="nama@email.com"
                     />
                   </div>
@@ -146,13 +182,15 @@ const LoginPage = () => {
                       required
                       value={formData.password}
                       onChange={handleInputChange}
-                      className="w-full pl-11 pr-12 py-3 border border-[#8B7355]/30 rounded-xl focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] transition-all bg-white/50"
+                      disabled={loading}
+                      className="w-full pl-11 pr-12 py-3 border border-[#8B7355]/30 rounded-xl focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] transition-all bg-white/50 disabled:opacity-50 disabled:cursor-not-allowed"
                       placeholder="Masukkan password"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#8B7355] hover:text-[#2C2C2C] transition-colors"
+                      disabled={loading}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#8B7355] hover:text-[#2C2C2C] transition-colors disabled:opacity-50"
                     >
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
@@ -166,13 +204,18 @@ const LoginPage = () => {
                       id="remember-me"
                       name="remember-me"
                       type="checkbox"
-                      className="h-4 w-4 text-[#8B7355] focus:ring-[#8B7355] border-[#8B7355]/30 rounded"
+                      disabled={loading}
+                      className="h-4 w-4 text-[#8B7355] focus:ring-[#8B7355] border-[#8B7355]/30 rounded disabled:opacity-50"
                     />
                     <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
                       Ingat saya
                     </label>
                   </div>
-                  <Link to="/forgot-password" className="text-sm text-[#8B7355] hover:text-[#2C2C2C] transition-colors">
+                  <Link 
+                    to="/forgot-password" 
+                    className="text-sm text-[#8B7355] hover:text-[#2C2C2C] transition-colors"
+                    tabIndex={loading ? -1 : 0}
+                  >
                     Lupa password?
                   </Link>
                 </div>
@@ -180,17 +223,32 @@ const LoginPage = () => {
                 {/* Submit Button */}
                 <motion.button
                   type="submit"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full bg-[#2C2C2C] hover:bg-[#1a1a1a] text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
+                  disabled={loading}
+                  whileHover={!loading ? { scale: 1.02 } : {}}
+                  whileTap={!loading ? { scale: 0.98 } : {}}
+                  className="w-full bg-[#2C2C2C] hover:bg-[#1a1a1a] text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Masuk
+                  {loading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      Memproses...
+                    </span>
+                  ) : (
+                    'Masuk'
+                  )}
                 </motion.button>
 
                 {/* Register Link */}
                 <div className="text-center pt-4">
                   <span className="text-gray-600">Belum punya akun? </span>
-                  <Link to="/register" className="text-[#8B7355] hover:text-[#2C2C2C] font-medium transition-colors">
+                  <Link 
+                    to="/register" 
+                    className="text-[#8B7355] hover:text-[#2C2C2C] font-medium transition-colors"
+                    tabIndex={loading ? -1 : 0}
+                  >
                     Daftar sekarang
                   </Link>
                 </div>

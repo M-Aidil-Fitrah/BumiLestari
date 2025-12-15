@@ -1,22 +1,71 @@
-import React, { useState } from 'react';
+// src/pages/ProductDetailPage.tsx
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { dummyProducts } from '../data/products';
+import { productService } from '@/lib/products';
+import type { Product } from '@/lib/supabase';
 import ProductImageGallery from '../components/ui/ProductImageGallery';
 import ProductInfo from '../components/ui/ProductInfo';
 import ReviewSection from '../components/ui/ReviewSection';
 import Navbar from '../components/ui/Navbar';
 import { Footer } from '../components/ui/Footer';
-import type { Product } from '../data/products';
 
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'description' | 'details' | 'reviews'>('description');
+  const [product, setProduct] = useState<Product | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Find product by ID
-  const product = dummyProducts.find(p => p.id === id);
+  useEffect(() => {
+    if (id) {
+      loadProductData(id);
+    }
+  }, [id]);
 
+  const loadProductData = async (productId: string) => {
+    setLoading(true);
+    try {
+      // Load product detail
+      const productData = await productService.getProduct(productId);
+      setProduct(productData);
+
+      // Load related products (same category)
+      const allProducts = await productService.getProducts({
+        category: productData.category_id,
+      });
+      
+      // Filter out current product and limit to 4
+      const related = allProducts
+        .filter(p => p.id !== productId)
+        .slice(0, 4);
+      setRelatedProducts(related);
+
+    } catch (error) {
+      console.error('Error loading product:', error);
+      setProduct(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#F5F3EE]">
+        <Navbar />
+        <div className="pt-32 pb-20 flex items-center justify-center px-4">
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#8B7355] border-t-transparent mb-4"></div>
+            <p className="text-gray-600">Memuat produk...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Product not found
   if (!product) {
     return (
       <div className="min-h-screen bg-[#F5F3EE]">
@@ -73,7 +122,7 @@ const ProductDetailPage: React.FC = () => {
   const tabs = [
     { id: 'description', label: 'Deskripsi' },
     { id: 'details', label: 'Detail Produk' },
-    { id: 'reviews', label: `Ulasan (${product.reviews})` }
+    { id: 'reviews', label: `Ulasan (${product.reviews_count})` }
   ] as const;
 
   return (
@@ -115,8 +164,7 @@ const ProductDetailPage: React.FC = () => {
           </motion.div>
 
           {/* Product Main Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16"
-          >
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
             {/* Product Images */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -209,21 +257,23 @@ const ProductDetailPage: React.FC = () => {
                   </div>
 
                   {/* Tags */}
-                  <div>
-                    <h4 className="text-lg font-bold text-[#2C2C2C] mb-3" style={{ fontFamily: 'var(--font-heading)' }}>
-                      Tags
-                    </h4>
-                    <div className="flex flex-wrap gap-2">
-                      {product.tags.map((tag, index) => (
-                        <span
-                          key={index}
-                          className="bg-[#8B7355]/10 text-[#8B7355] text-sm font-medium px-4 py-2 rounded-full hover:bg-[#8B7355]/20 transition-colors cursor-pointer"
-                        >
-                          #{tag}
-                        </span>
-                      ))}
+                  {product.tags && product.tags.length > 0 && (
+                    <div>
+                      <h4 className="text-lg font-bold text-[#2C2C2C] mb-3" style={{ fontFamily: 'var(--font-heading)' }}>
+                        Tags
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {product.tags.map((tag, index) => (
+                          <span
+                            key={index}
+                            className="bg-[#8B7355]/10 text-[#8B7355] text-sm font-medium px-4 py-2 rounded-full hover:bg-[#8B7355]/20 transition-colors cursor-pointer"
+                          >
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </motion.div>
               )}
 
@@ -240,12 +290,12 @@ const ProductDetailPage: React.FC = () => {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {[
-                      { label: 'Kategori', value: product.category },
                       { label: 'Stok Tersedia', value: `${product.stock} unit` },
-                      { label: 'Rating', value: `${product.rating}/5.0 (${product.reviews} ulasan)` },
+                      { label: 'Rating', value: `${product.rating}/5.0 (${product.reviews_count} ulasan)` },
                       { label: 'Penjual', value: product.seller },
-                      { label: 'SKU', value: `BL-${product.id.padStart(6, '0')}` },
-                      { label: 'Berat', value: '500 gram' }
+                      { label: 'SKU', value: `BL-${product.id.substring(0, 8)}` },
+                      { label: 'Berat', value: '500 gram' },
+                      { label: 'Featured', value: product.is_featured ? 'Ya' : 'Tidak' }
                     ].map((item, index) => (
                       <div key={index} className="flex items-start">
                         <div className="w-40 flex-shrink-0">
@@ -288,7 +338,7 @@ const ProductDetailPage: React.FC = () => {
                   <ReviewSection
                     productId={product.id}
                     productRating={product.rating}
-                    totalReviews={product.reviews}
+                    totalReviews={product.reviews_count}
                   />
                 </motion.div>
               )}
@@ -306,61 +356,58 @@ const ProductDetailPage: React.FC = () => {
               Produk Serupa
             </h2>
             
-            {dummyProducts.filter(p => p.category === product.category && p.id !== product.id).length > 0 ? (
+            {relatedProducts.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {dummyProducts
-                  .filter(p => p.category === product.category && p.id !== product.id)
-                  .slice(0, 4)
-                  .map((relatedProduct, index) => (
-                    <motion.div
-                      key={relatedProduct.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1 * index }}
-                      className="group cursor-pointer"
-                      onClick={() => {
-                        navigate(`/marketplace/product/${relatedProduct.id}`);
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                      }}
-                    >
-                      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                        <div className="relative aspect-square overflow-hidden bg-gray-50">
-                          <img
-                            src={relatedProduct.image}
-                            alt={relatedProduct.name}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.src = 'https://via.placeholder.com/300x300?text=No+Image';
-                            }}
-                          />
-                          {relatedProduct.rating >= 4.8 && (
-                            <span className="absolute top-3 left-3 bg-[#8B7355] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                              Featured
-                            </span>
-                          )}
-                        </div>
-                        <div className="p-4">
-                          <h3 className="font-semibold text-[#2C2C2C] text-sm mb-2 line-clamp-2 min-h-[40px]">
-                            {relatedProduct.name}
-                          </h3>
-                          <div className="flex items-center justify-between">
-                            <p className="text-[#8B7355] font-bold text-lg">
-                              {new Intl.NumberFormat('id-ID', {
-                                style: 'currency',
-                                currency: 'IDR',
-                                minimumFractionDigits: 0,
-                              }).format(relatedProduct.price)}
-                            </p>
-                            <div className="flex items-center text-xs text-gray-500">
-                              <span className="text-yellow-400 mr-1">★</span>
-                              {relatedProduct.rating}
-                            </div>
+                {relatedProducts.map((relatedProduct, index) => (
+                  <motion.div
+                    key={relatedProduct.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 * index }}
+                    className="group cursor-pointer"
+                    onClick={() => {
+                      navigate(`/marketplace/product/${relatedProduct.id}`);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                  >
+                    <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                      <div className="relative aspect-square overflow-hidden bg-gray-50">
+                        <img
+                          src={relatedProduct.image}
+                          alt={relatedProduct.name}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = 'https://via.placeholder.com/300x300?text=No+Image';
+                          }}
+                        />
+                        {relatedProduct.badge && (
+                          <span className="absolute top-3 left-3 bg-[#8B7355] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                            {relatedProduct.badge}
+                          </span>
+                        )}
+                      </div>
+                      <div className="p-4">
+                        <h3 className="font-semibold text-[#2C2C2C] text-sm mb-2 line-clamp-2 min-h-[40px]">
+                          {relatedProduct.name}
+                        </h3>
+                        <div className="flex items-center justify-between">
+                          <p className="text-[#8B7355] font-bold text-lg">
+                            {new Intl.NumberFormat('id-ID', {
+                              style: 'currency',
+                              currency: 'IDR',
+                              minimumFractionDigits: 0,
+                            }).format(relatedProduct.price)}
+                          </p>
+                          <div className="flex items-center text-xs text-gray-500">
+                            <span className="text-yellow-400 mr-1">★</span>
+                            {relatedProduct.rating}
                           </div>
                         </div>
                       </div>
-                    </motion.div>
-                  ))}
+                    </div>
+                  </motion.div>
+                ))}
               </div>
             ) : (
               <div className="text-center py-12">
