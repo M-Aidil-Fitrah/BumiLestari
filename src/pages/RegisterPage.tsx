@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, Mail, Lock, User, Phone, ArrowLeft, Leaf, ShoppingBag, Shield } from 'lucide-react';
 import { authService } from '@/lib/auth';
+import { logAuth, logError, logValidation, logUserAction } from '@/utils/logger';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -27,35 +28,62 @@ const RegisterPage = () => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
+    
     // Clear error saat user mulai mengetik
     if (error) setError('');
   };
 
   const validateForm = () => {
+    const startTime = Date.now();
+
     // Validasi password match
     if (formData.password !== formData.confirmPassword) {
-      setError('Password tidak cocok!');
+      const errorMsg = 'Password tidak cocok!';
+      setError(errorMsg);
+      logValidation('confirmPassword', errorMsg, {
+        email: formData.email,
+      });
       return false;
     }
 
     // Validasi panjang password
     if (formData.password.length < 8) {
-      setError('Password minimal 8 karakter');
+      const errorMsg = 'Password minimal 8 karakter';
+      setError(errorMsg);
+      logValidation('password', errorMsg, {
+        email: formData.email,
+        password_length: formData.password.length,
+      });
       return false;
     }
 
     // Validasi terms
     if (!formData.acceptTerms) {
-      setError('Harap setujui syarat dan ketentuan!');
+      const errorMsg = 'Harap setujui syarat dan ketentuan!';
+      setError(errorMsg);
+      logValidation('acceptTerms', errorMsg, {
+        email: formData.email,
+      });
       return false;
     }
 
     // Validasi nomor telepon (Indonesia)
     const phoneRegex = /^(\+62|62|0)[0-9]{9,12}$/;
     if (!phoneRegex.test(formData.phone)) {
-      setError('Nomor telepon tidak valid');
+      const errorMsg = 'Nomor telepon tidak valid';
+      setError(errorMsg);
+      logValidation('phone', errorMsg, {
+        email: formData.email,
+        phone: formData.phone,
+      });
       return false;
     }
+
+    // Log validation success
+    logUserAction('form_validation_success', {
+      email: formData.email,
+      validation_duration_ms: Date.now() - startTime,
+    });
 
     return true;
   };
@@ -64,14 +92,30 @@ const RegisterPage = () => {
     e.preventDefault();
     setError('');
 
+    const submitStartTime = Date.now();
+
+    // Log registration attempt
+    logAuth('register', {
+      stage: 'started',
+      email: formData.email,
+      has_phone: !!formData.phone,
+    });
+
     // Validasi form
     if (!validateForm()) {
+      logAuth('register', {
+        stage: 'validation_failed',
+        email: formData.email,
+      });
       return;
     }
 
     setLoading(true);
 
     try {
+      const registerStartTime = Date.now();
+
+      // Call Supabase auth
       await authService.signUp({
         fullName: formData.fullName,
         email: formData.email,
@@ -79,9 +123,26 @@ const RegisterPage = () => {
         phone: formData.phone,
       });
 
+      const registerDuration = Date.now() - registerStartTime;
+
+      // Log successful registration
+      logAuth('register', {
+        stage: 'success',
+        email: formData.email,
+        full_name: formData.fullName,
+        phone: formData.phone,
+        registration_duration_ms: registerDuration,
+        total_duration_ms: Date.now() - submitStartTime,
+      });
+
       // Registrasi berhasil
       setSuccess(true);
       
+      // Log redirect
+      logUserAction('register_redirect_to_login', {
+        email: formData.email,
+      });
+
       // Redirect ke login setelah 3 detik
       setTimeout(() => {
         navigate('/login');
@@ -90,20 +151,44 @@ const RegisterPage = () => {
     } catch (err: any) {
       console.error('Register error:', err);
       
+      let errorMessage = '';
+
       // Handle berbagai error dari Supabase
       if (err.message.includes('User already registered')) {
-        setError('Email sudah terdaftar. Silakan gunakan email lain atau login.');
+        errorMessage = 'Email sudah terdaftar. Silakan gunakan email lain atau login.';
       } else if (err.message.includes('Password should be at least 6 characters')) {
-        setError('Password minimal 6 karakter');
+        errorMessage = 'Password minimal 6 karakter';
       } else if (err.message.includes('Unable to validate email address')) {
-        setError('Format email tidak valid');
+        errorMessage = 'Format email tidak valid';
       } else {
-        setError(err.message || 'Terjadi kesalahan saat mendaftar');
+        errorMessage = err.message || 'Terjadi kesalahan saat mendaftar';
       }
+
+      setError(errorMessage);
+
+      // Log registration error
+      logError(err, {
+        context: 'register_page',
+        stage: 'registration_failed',
+        email: formData.email,
+        error_message: errorMessage,
+        error_type: err.name || 'Unknown',
+        supabase_error: err.message,
+        total_duration_ms: Date.now() - submitStartTime,
+      });
+
     } finally {
       setLoading(false);
     }
   };
+
+  // Log page view saat component mount
+  useState(() => {
+    logUserAction('page_view', {
+      page: 'register',
+      referrer: document.referrer,
+    });
+  });
 
   // Success message component
   if (success) {
@@ -128,6 +213,7 @@ const RegisterPage = () => {
           </p>
           <Link 
             to="/login"
+            onClick={() => logUserAction('click_manual_redirect_to_login')}
             className="inline-block mt-4 text-[#8B7355] hover:text-[#2C2C2C] font-medium"
           >
             Langsung ke Login →
@@ -141,7 +227,10 @@ const RegisterPage = () => {
     <div className="relative min-h-screen bg-[#F5F3EE] overflow-hidden py-8">
       {/* Back Button */}
       <motion.button
-        onClick={() => navigate('/')}
+        onClick={() => {
+          logUserAction('click_back_button', { from_page: 'register' });
+          navigate('/');
+        }}
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5 }}
@@ -249,6 +338,7 @@ const RegisterPage = () => {
                         required
                         value={formData.fullName}
                         onChange={handleInputChange}
+                        onFocus={() => logUserAction('focus_input', { field: 'fullName' })}
                         disabled={loading}
                         className="w-full pl-11 pr-4 py-3 border border-[#8B7355]/30 rounded-xl focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] transition-all bg-white/50 disabled:opacity-50 disabled:cursor-not-allowed"
                         placeholder="Nama lengkap"
@@ -270,6 +360,7 @@ const RegisterPage = () => {
                         required
                         value={formData.email}
                         onChange={handleInputChange}
+                        onFocus={() => logUserAction('focus_input', { field: 'email' })}
                         disabled={loading}
                         className="w-full pl-11 pr-4 py-3 border border-[#8B7355]/30 rounded-xl focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] transition-all bg-white/50 disabled:opacity-50 disabled:cursor-not-allowed"
                         placeholder="nama@email.com"
@@ -292,6 +383,7 @@ const RegisterPage = () => {
                       required
                       value={formData.phone}
                       onChange={handleInputChange}
+                      onFocus={() => logUserAction('focus_input', { field: 'phone' })}
                       disabled={loading}
                       className="w-full pl-11 pr-4 py-3 border border-[#8B7355]/30 rounded-xl focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] transition-all bg-white/50 disabled:opacity-50 disabled:cursor-not-allowed"
                       placeholder="08xxxxxxxxxx"
@@ -315,13 +407,17 @@ const RegisterPage = () => {
                         required
                         value={formData.password}
                         onChange={handleInputChange}
+                        onFocus={() => logUserAction('focus_input', { field: 'password' })}
                         disabled={loading}
                         className="w-full pl-11 pr-12 py-3 border border-[#8B7355]/30 rounded-xl focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] transition-all bg-white/50 disabled:opacity-50 disabled:cursor-not-allowed"
                         placeholder="Min. 8 karakter"
                       />
                       <button
                         type="button"
-                        onClick={() => setShowPassword(!showPassword)}
+                        onClick={() => {
+                          setShowPassword(!showPassword);
+                          logUserAction('toggle_password_visibility', { field: 'password', visible: !showPassword });
+                        }}
                         disabled={loading}
                         className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#8B7355] hover:text-[#2C2C2C] transition-colors disabled:opacity-50"
                       >
@@ -344,13 +440,17 @@ const RegisterPage = () => {
                         required
                         value={formData.confirmPassword}
                         onChange={handleInputChange}
+                        onFocus={() => logUserAction('focus_input', { field: 'confirmPassword' })}
                         disabled={loading}
                         className="w-full pl-11 pr-12 py-3 border border-[#8B7355]/30 rounded-xl focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] transition-all bg-white/50 disabled:opacity-50 disabled:cursor-not-allowed"
                         placeholder="Konfirmasi password"
                       />
                       <button
                         type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        onClick={() => {
+                          setShowConfirmPassword(!showConfirmPassword);
+                          logUserAction('toggle_password_visibility', { field: 'confirmPassword', visible: !showConfirmPassword });
+                        }}
                         disabled={loading}
                         className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#8B7355] hover:text-[#2C2C2C] transition-colors disabled:opacity-50"
                       >
@@ -369,16 +469,27 @@ const RegisterPage = () => {
                     required
                     checked={formData.acceptTerms}
                     onChange={handleInputChange}
+                    onClick={() => logUserAction('click_accept_terms', { accepted: !formData.acceptTerms })}
                     disabled={loading}
                     className="h-4 w-4 text-[#8B7355] focus:ring-[#8B7355] border-[#8B7355]/30 rounded mt-1 disabled:opacity-50"
                   />
                   <label htmlFor="acceptTerms" className="ml-2 block text-sm text-gray-700">
                     Saya menyetujui{' '}
-                    <Link to="/terms" className="text-[#8B7355] hover:text-[#2C2C2C] transition-colors" tabIndex={loading ? -1 : 0}>
+                    <Link 
+                      to="/terms" 
+                      onClick={() => logUserAction('click_terms_link')}
+                      className="text-[#8B7355] hover:text-[#2C2C2C] transition-colors" 
+                      tabIndex={loading ? -1 : 0}
+                    >
                       Syarat & Ketentuan
                     </Link>{' '}
                     dan{' '}
-                    <Link to="/privacy" className="text-[#8B7355] hover:text-[#2C2C2C] transition-colors" tabIndex={loading ? -1 : 0}>
+                    <Link 
+                      to="/privacy" 
+                      onClick={() => logUserAction('click_privacy_link')}
+                      className="text-[#8B7355] hover:text-[#2C2C2C] transition-colors" 
+                      tabIndex={loading ? -1 : 0}
+                    >
                       Kebijakan Privasi
                     </Link>
                   </label>
@@ -410,6 +521,7 @@ const RegisterPage = () => {
                   <span className="text-gray-600">Sudah punya akun? </span>
                   <Link 
                     to="/login" 
+                    onClick={() => logUserAction('click_login_link', { from_page: 'register' })}
                     className="text-[#8B7355] hover:text-[#2C2C2C] font-medium transition-colors"
                     tabIndex={loading ? -1 : 0}
                   >

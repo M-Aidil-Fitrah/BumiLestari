@@ -8,6 +8,8 @@ import RegisterPage from './pages/RegisterPage';
 import AdminDashboard from './pages/AdminDashboard';
 import LogoutPage from './pages/LogoutPage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
+import TestLokiSimple from './pages/TestLokiSimple';
+
 
 
 
@@ -17,6 +19,9 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/test-loki" element={<TestLokiSimple />} />
+
+
         <Route path="/marketplace" element={<MarketplacePage />} />
         <Route path="/marketplace/product/:id" element={<ProductDetailPage />} />
         <Route path="/payment" element={<PaymentPage />} />
