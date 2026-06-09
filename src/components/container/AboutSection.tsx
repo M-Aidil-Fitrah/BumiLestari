@@ -1,7 +1,14 @@
-import { motion } from 'framer-motion';
+import { useRef } from 'react';
 import { ArrowRight } from 'lucide-react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { TextReveal } from '../ui/TextReveal';
+import { MagneticButton } from '../ui/MagneticButton';
 
 export const AboutSection = () => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const cardsRef = useRef<HTMLDivElement>(null);
+
   const features = [
     {
       number: '01',
@@ -23,116 +30,121 @@ export const AboutSection = () => {
     }
   ];
 
+  useGSAP(() => {
+    if (!sectionRef.current) return;
+
+    // Fanned-out effect for the first two cards on scroll
+    const cards = gsap.utils.toArray<HTMLElement>('.feature-card');
+    
+    cards.forEach((card, i) => {
+      gsap.fromTo(card, 
+        { 
+          y: 100, 
+          opacity: 0, 
+          rotation: i % 2 === 0 ? -5 : 5 
+        },
+        {
+          y: 0,
+          opacity: 1,
+          rotation: 0,
+          duration: 1,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 85%',
+          }
+        }
+      );
+    });
+
+    // Third feature and video animation
+    gsap.fromTo('.feature-third', 
+      { y: 100, opacity: 0 },
+      { 
+        y: 0, opacity: 1, duration: 1, ease: 'power3.out',
+        scrollTrigger: {
+          trigger: '.feature-third',
+          start: 'top 80%',
+        }
+      }
+    );
+
+    gsap.fromTo('.video-container', 
+      { scale: 0.9, opacity: 0 },
+      { 
+        scale: 1, opacity: 1, duration: 1.2, ease: 'power4.out',
+        scrollTrigger: {
+          trigger: '.video-container',
+          start: 'top 80%',
+        }
+      }
+    );
+
+  }, { scope: sectionRef });
+
   return (
-    <section className="py-20 bg-white">
+    <section ref={sectionRef} className="py-20 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
         {/* Section Title */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <h2 
-            className="text-5xl md:text-6xl font-bold text-[#2C2C2C] mb-4"
-            style={{ fontFamily: 'var(--font-heading)' }}
-          >
-            Tentang BumiLestari
+        <div className="text-center mb-16">
+          <h2 className="text-5xl md:text-6xl font-bold text-[#2C2C2C] mb-4 overflow-hidden" style={{ fontFamily: 'var(--font-heading)' }}>
+            <TextReveal>Tentang BumiLestari</TextReveal>
           </h2>
-          <p 
-            className="text-xl text-gray-600 max-w-2xl mx-auto"
-            style={{ fontFamily: 'var(--font-body)' }}
-          >
-            Menyediakan produk ramah lingkungan untuk gaya hidup berkelanjutan
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto overflow-hidden" style={{ fontFamily: 'var(--font-body)' }}>
+            <TextReveal delay={0.2}>Menyediakan produk ramah lingkungan untuk gaya hidup berkelanjutan</TextReveal>
           </p>
-        </motion.div>
+        </div>
 
         {/* Feature Cards */}
-        <div className="grid md:grid-cols-2 gap-8 mb-16">
-          {features.slice(0, 2).map((feature, index) => (
-            <motion.div
-              key={feature.number}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.2 }}
-              className="group"
-            >
-              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-50 to-gray-100 p-8 md:p-10 hover:shadow-2xl transition-all duration-500">
+        <div ref={cardsRef} className="grid md:grid-cols-2 gap-8 mb-16 perspective-1000">
+          {features.slice(0, 2).map((feature) => (
+            <div key={feature.number} className="feature-card group origin-bottom">
+              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-50 to-gray-100 p-8 md:p-10 hover:shadow-2xl transition-all duration-500 border border-gray-100">
                 <div className="flex items-start justify-between mb-6">
-                  <span 
-                    className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-gray-200 to-gray-300"
-                    style={{ fontFamily: 'var(--font-heading)' }}
-                  >
+                  <span className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-gray-300 to-gray-400" style={{ fontFamily: 'var(--font-heading)' }}>
                     {feature.number}
                   </span>
                 </div>
-                <h3 
-                  className="text-3xl font-bold text-gray-900 mb-4"
-                  style={{ fontFamily: 'var(--font-heading)' }}
-                >
+                <h3 className="text-3xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
                   {feature.title}
                 </h3>
-                <p 
-                  className="text-gray-600 leading-relaxed mb-6"
-                  style={{ fontFamily: 'var(--font-body)' }}
-                >
+                <p className="text-gray-600 leading-relaxed mb-6" style={{ fontFamily: 'var(--font-body)' }}>
                   {feature.description}
                 </p>
-                <button className="flex items-center gap-2 text-gray-900 font-medium group-hover:gap-3 transition-all">
+                <MagneticButton className="flex items-center gap-2 text-gray-900 font-medium transition-all" magneticForce={0.2}>
                   <span>Pelajari Lebih Lanjut</span>
-                  <ArrowRight className="w-5 h-5" />
-                </button>
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </MagneticButton>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
 
         {/* Third Feature with Image */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.4 }}
-          className="grid md:grid-cols-2 gap-8 items-center"
-        >
-          <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl p-8 md:p-10">
-            <span 
-              className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-gray-200 to-gray-300"
-              style={{ fontFamily: 'var(--font-heading)' }}
-            >
+        <div className="feature-third grid md:grid-cols-2 gap-8 items-center">
+          <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl p-8 md:p-10 border border-gray-100">
+            <span className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-gray-300 to-gray-400" style={{ fontFamily: 'var(--font-heading)' }}>
               {features[2].number}
             </span>
-            <h3 
-              className="text-3xl font-bold text-gray-900 mt-6 mb-4"
-              style={{ fontFamily: 'var(--font-heading)' }}
-            >
+            <h3 className="text-3xl font-bold text-gray-900 mt-6 mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
               {features[2].title}
             </h3>
-            <p 
-              className="text-gray-600 leading-relaxed"
-              style={{ fontFamily: 'var(--font-body)' }}
-            >
+            <p className="text-gray-600 leading-relaxed" style={{ fontFamily: 'var(--font-body)' }}>
               {features[2].description}
             </p>
           </div>
-          <div className="relative h-96 rounded-3xl overflow-hidden shadow-xl">
+          <div className="relative h-96 rounded-3xl overflow-hidden shadow-xl group">
             <img 
               src={features[2].image} 
               alt={features[2].title}
-              className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
             />
           </div>
-        </motion.div>
+        </div>
 
         {/* Video Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.6 }}
-          className="mt-16 relative rounded-3xl overflow-hidden shadow-2xl"
-        >
+        <div className="video-container mt-16 relative rounded-3xl overflow-hidden shadow-2xl">
           <div className="aspect-video w-full">
             <iframe
               width="100%"
@@ -145,9 +157,8 @@ export const AboutSection = () => {
               className="w-full h-full"
             />
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
 };
-

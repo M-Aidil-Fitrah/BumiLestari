@@ -1,6 +1,10 @@
-import { motion } from 'framer-motion';
+import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Tag, TrendingUp, Package } from 'lucide-react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { MagneticButton } from './MagneticButton';
+import { TextReveal } from './TextReveal';
 
 interface HeroProps {
   title?: string;
@@ -16,6 +20,9 @@ export const Hero = ({
   onCtaClick
 }: HeroProps) => {
   const navigate = useNavigate();
+  const heroRef = useRef<HTMLElement>(null);
+  const textContainerRef = useRef<HTMLDivElement>(null);
+  const imageContainerRef = useRef<HTMLDivElement>(null);
 
   const handleCtaClick = () => {
     if (onCtaClick) {
@@ -48,109 +55,125 @@ export const Hero = ({
     }
   ];
 
+  useGSAP(() => {
+    if (!heroRef.current) return;
+
+    // Fade in section
+    gsap.to(heroRef.current, { opacity: 1, duration: 1 });
+
+    // Animate paragraph description
+    gsap.fromTo('.hero-desc', 
+      { opacity: 0, y: 20 },
+      { opacity: 1, y: 0, duration: 1, delay: 0.8, ease: 'power3.out' }
+    );
+
+    // Animate CTA
+    gsap.fromTo('.hero-cta', 
+      { opacity: 0, y: 30 },
+      { opacity: 1, y: 0, duration: 1, delay: 1, ease: 'back.out(1.7)' }
+    );
+
+    // Animate Cards with stagger and 3D rotation feel
+    gsap.fromTo('.hero-card',
+      { opacity: 0, y: 100, rotationX: -15 },
+      { 
+        opacity: 1, 
+        y: 0, 
+        rotationX: 0, 
+        duration: 1.2, 
+        stagger: 0.2, 
+        delay: 0.6, 
+        ease: 'power4.out',
+        transformPerspective: 1000
+      }
+    );
+
+    // Parallax effect on cards container when scrolling
+    gsap.to(imageContainerRef.current, {
+      y: 100,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: heroRef.current,
+        start: 'top top',
+        end: 'bottom top',
+        scrub: true
+      }
+    });
+
+  }, { scope: heroRef });
+
   return (
-    <motion.section 
-      className="relative h-screen bg-[#F5F3EE] overflow-hidden flex items-center justify-center"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.8 }}
+    <section 
+      ref={heroRef}
+      className="relative min-h-screen bg-[#F5F3EE] overflow-hidden flex items-center justify-center opacity-0 pt-20 pb-10"
     >
       {/* Background gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#F5F3EE]/80 to-[#F5F3EE]"></div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-16">
-        {/* Hero Content */}
-        <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          
           {/* Left Content */}
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-left"
-          >
-            <motion.h1 
-              className="text-6xl md:text-7xl lg:text-8xl font-bold text-[#2C2C2C] mb-4"
-              style={{ fontFamily: 'var(--font-heading)' }}
-            >
-              {title}
-            </motion.h1>
-            <motion.p 
-              className="text-2xl md:text-3xl text-[#8B7355] mb-8 italic"
-              style={{ fontFamily: 'var(--font-heading)' }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-            >
-              {subtitle}
-            </motion.p>
-            <motion.p 
-              className="text-base md:text-lg text-gray-600 mb-8 max-w-lg leading-relaxed"
-              style={{ fontFamily: 'var(--font-body)' }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
-            >
+          <div ref={textContainerRef} className="text-left">
+            <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold text-[#2C2C2C] mb-4 overflow-hidden" style={{ fontFamily: 'var(--font-heading)' }}>
+              <TextReveal delay={0.2}>{title}</TextReveal>
+            </h1>
+            <p className="text-2xl md:text-3xl text-[#8B7355] mb-8 italic overflow-hidden" style={{ fontFamily: 'var(--font-heading)' }}>
+              <TextReveal delay={0.5}>{subtitle}</TextReveal>
+            </p>
+            <p className="hero-desc text-base md:text-lg text-gray-600 mb-8 max-w-lg leading-relaxed" style={{ fontFamily: 'var(--font-body)' }}>
               Temukan koleksi produk ramah lingkungan yang dirancang untuk menciptakan gaya hidup berkelanjutan. 
               Dari peralatan rumah tangga hingga produk perawatan, semua dibuat dengan cinta untuk bumi.
-            </motion.p>
-            <motion.button
-              onClick={handleCtaClick}
-              className="group flex items-center gap-3 bg-[#2C2C2C] text-white px-8 py-4 rounded-full font-medium transition-all duration-300 hover:bg-[#1a1a1a] hover:shadow-xl"
-              style={{ fontFamily: 'var(--font-body)' }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
-            >
-              <span>{ctaText}</span>
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </motion.button>
-          </motion.div>
+            </p>
+            
+            <div className="hero-cta">
+              <MagneticButton
+                onClick={handleCtaClick}
+                magneticForce={0.3}
+                className="group flex items-center gap-3 bg-[#2C2C2C] text-white px-8 py-4 rounded-full font-medium transition-colors duration-300 hover:bg-[#1a1a1a]"
+                style={{ fontFamily: 'var(--font-body)' }}
+              >
+                <span>{ctaText}</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </MagneticButton>
+            </div>
+          </div>
 
           {/* Right - Featured Products Cards */}
-          <motion.div
-            className="grid grid-cols-2 gap-4"
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          >
+          <div ref={imageContainerRef} className="grid grid-cols-2 gap-4">
             {featuredProducts.map((product, index) => (
-              <motion.div
+              <div
                 key={product.id}
-                className={`relative rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer group ${
+                className={`hero-card relative rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow cursor-pointer group ${
                   index === 0 ? 'col-span-2 h-80' : 'h-64'
                 }`}
-                whileHover={{ y: -8 }}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 + index * 0.1 }}
               >
                 <img 
                   src={product.image} 
                   alt={product.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-                <div className="absolute bottom-0 left-0 right-0 p-6">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent transition-opacity group-hover:opacity-90"></div>
+                <div className="absolute bottom-0 left-0 right-0 p-6 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
                   <span className="inline-block bg-white/90 text-gray-800 px-3 py-1 rounded-full text-xs font-medium mb-2">
                     {product.tag}
                   </span>
                   <h3 className="text-white text-xl font-semibold" style={{ fontFamily: 'var(--font-heading)' }}>
                     {product.name}
                   </h3>
-                  <button className="mt-2 text-white flex items-center gap-1 text-sm group/btn">
-                    <span>View More</span>
-                    <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="mt-2 text-white/80 flex items-center gap-1 text-sm group/btn overflow-hidden">
+                    <span className="transform translate-y-full group-hover:translate-y-0 transition-transform duration-500 delay-100">View More</span>
+                    <svg className="w-4 h-4 transform translate-y-full group-hover:translate-y-0 group-hover:translate-x-1 transition-all duration-500 delay-150" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
-                  </button>
+                  </div>
                 </div>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
+
         </div>
       </div>
-    </motion.section>
+    </section>
   );
 };
