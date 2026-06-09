@@ -339,6 +339,7 @@ const ProductDetailPage: React.FC = () => {
                     productId={product.id}
                     productRating={product.rating}
                     totalReviews={product.reviews_count}
+                    onReviewAdded={() => loadProductData(product.id)}
                   />
                 </motion.div>
               )}

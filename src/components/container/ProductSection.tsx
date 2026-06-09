@@ -1,40 +1,92 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Product } from '@/lib/supabase';
+import { productService } from '@/lib/products';
 import { ArrowRight } from 'lucide-react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 
+const hardcodedFallback: Product[] = [
+  {
+    id: '1',
+    name: 'Set Botol Minum Bambu',
+    category: 'Lifestyle',
+    price: 150000,
+    image: '/images/bambueco.jpeg',
+    category_id: '',
+    rating: 0,
+    reviews_count: 0,
+    description: '',
+    stock: 0,
+    seller: '',
+    tags: [],
+    is_featured: true,
+    badge: null,
+    created_at: '',
+    updated_at: ''
+  },
+  {
+    id: '2',
+    name: 'Diffuser Aromaterapi',
+    category: 'Home',
+    price: 250000,
+    image: '/images/diffuser.jpg',
+    category_id: '',
+    rating: 0,
+    reviews_count: 0,
+    description: '',
+    stock: 0,
+    seller: '',
+    tags: [],
+    is_featured: true,
+    badge: null,
+    created_at: '',
+    updated_at: ''
+  },
+  {
+    id: '3',
+    name: 'Lilin Kedelai Organik',
+    category: 'Home',
+    price: 85000,
+    image: '/images/lilin.jpg',
+    category_id: '',
+    rating: 0,
+    reviews_count: 0,
+    description: '',
+    stock: 0,
+    seller: '',
+    tags: [],
+    is_featured: true,
+    badge: null,
+    created_at: '',
+    updated_at: ''
+  }
+];
+
 export const ProductSection = () => {
   const navigate = useNavigate();
   const sectionRef = useRef<HTMLElement>(null);
-  
-  const [featuredProducts] = useState<Partial<Product>[]>([
-    {
-      id: '1',
-      name: 'Set Botol Minum Bambu',
-      category: 'Lifestyle',
-      price: 150000,
-      image: '/images/bambueco.jpeg'
-    },
-    {
-      id: '2',
-      name: 'Diffuser Aromaterapi',
-      category: 'Home',
-      price: 250000,
-      image: '/images/diffuser.jpg'
-    },
-    {
-      id: '3',
-      name: 'Lilin Kedelai Organik',
-      category: 'Home',
-      price: 85000,
-      image: '/images/lilin.jpg'
-    }
-  ]);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    const loadFeatured = async () => {
+      try {
+        const data = await productService.getProducts();
+        if (data && data.length > 0) {
+          setFeaturedProducts(data.slice(0, 3));
+        } else {
+          setFeaturedProducts(hardcodedFallback);
+        }
+      } catch (err) {
+        console.error('Error loading featured products:', err);
+        setFeaturedProducts(hardcodedFallback);
+      }
+    };
+    loadFeatured();
+  }, []);
 
   useGSAP(() => {
-    if (!sectionRef.current) return;
+    if (!sectionRef.current || featuredProducts.length === 0) return;
 
     // Fast scroll skew effect
     let proxy = { skew: 0 },
@@ -78,7 +130,7 @@ export const ProductSection = () => {
       );
     });
 
-  }, { scope: sectionRef });
+  }, { dependencies: [featuredProducts], scope: sectionRef });
 
   return (
     <section ref={sectionRef} className="py-32 bg-[#F5F3EE] relative overflow-hidden">

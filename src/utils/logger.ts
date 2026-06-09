@@ -8,18 +8,11 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 // URL Edge Function (ganti sesuai project kamu)
 const LOG_ENDPOINT = `${SUPABASE_URL}/functions/v1/log-to-loki`;
 
-console.log('🔧 Logger initialized:', {
-  mode: import.meta.env.MODE,
-  isDev,
-  endpoint: LOG_ENDPOINT,
-  hasSupabaseUrl: !!SUPABASE_URL,
-  hasSupabaseKey: !!SUPABASE_ANON_KEY,
-});
 
 // Send log to Loki via Supabase Edge Function
 async function sendToLoki(logData: any) {
-  // 🚀 FORCE SEND: Always send to Loki even in development for testing
-  const forceSend = true;
+  // 🚀 FORCE SEND: Only send to Loki in production, print to console in development
+  const forceSend = false;
 
   // Development mode: also log to console
   if (isDev) {

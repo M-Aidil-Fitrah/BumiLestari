@@ -10,12 +10,14 @@ interface ReviewSectionProps {
   productId: string;
   productRating: number;
   totalReviews: number;
+  onReviewAdded?: () => void;
 }
 
 const ReviewSection: React.FC<ReviewSectionProps> = ({
   productId,
   productRating,
   totalReviews,
+  onReviewAdded,
 }) => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
@@ -79,7 +81,10 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
       setShowReviewForm(false);
       
       // Reload reviews
-      loadReviews();
+      await loadReviews();
+      if (onReviewAdded) {
+        onReviewAdded();
+      }
     } catch (error: any) {
       alert('Gagal menambahkan ulasan: ' + error.message);
     } finally {
