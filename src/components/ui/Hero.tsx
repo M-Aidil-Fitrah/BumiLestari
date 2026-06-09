@@ -1,6 +1,7 @@
-import { motion } from 'framer-motion';
+import { useRef } from 'react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Tag, TrendingUp, Package } from 'lucide-react';
 
 interface HeroProps {
   title?: string;
@@ -10,147 +11,90 @@ interface HeroProps {
 }
 
 export const Hero = ({
-  title = "BumiLestari",
-  subtitle = "untuk kehidupan berkelanjutan Anda",
-  ctaText = "Jelajahi Produk",
+  title = "BUMI LESTARI",
   onCtaClick
 }: HeroProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const videoWrapperRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLHeadingElement>(null);
   const navigate = useNavigate();
 
-  const handleCtaClick = () => {
-    if (onCtaClick) {
-      onCtaClick();
-    }
-    navigate('/marketplace');
-  };
+  useGSAP(() => {
+    if (!containerRef.current || !videoWrapperRef.current || !textRef.current) return;
 
-  const featuredProducts = [
-    {
-      id: 1,
-      name: 'Set Bambu Eco',
-      image: '/images/bambueco.jpeg',
-      tag: 'Terlaris',
-      icon: Package
-    },
-    {
-      id: 2,
-      name: 'Diffuser Alami',
-      image: '/images/diffuser.jpg',
-      tag: 'Baru',
-      icon: Tag
-    },
-    {
-      id: 3,
-      name: 'Lilin Organik',
-      image: '/images/lilin.jpg',
-      tag: 'Trending',
-      icon: TrendingUp
-    }
-  ];
+    // Initial entrance
+    gsap.fromTo(textRef.current, 
+      { opacity: 0, scale: 0.8 },
+      { opacity: 1, scale: 1, duration: 1.5, ease: 'power4.out' }
+    );
+
+    // Scroll pinned animation
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: 'top top',
+        end: '+=150%', // Pin for 150% of viewport height
+        pin: true,
+        scrub: true,
+      }
+    });
+
+    // Animate the clip-path of the video wrapper from a small circle to full screen
+    tl.fromTo(videoWrapperRef.current,
+      { clipPath: 'circle(10% at 50% 50%)' },
+      { clipPath: 'circle(150% at 50% 50%)', ease: 'none' },
+      0
+    );
+
+    // Animate the text to move up and fade out
+    tl.to(textRef.current, {
+      y: '-50vh',
+      opacity: 0,
+      scale: 1.5,
+      ease: 'power2.in'
+    }, 0);
+
+  }, { scope: containerRef });
 
   return (
-    <motion.section 
-      className="relative h-screen bg-[#F5F3EE] overflow-hidden flex items-center justify-center"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.8 }}
+    <section 
+      ref={containerRef} 
+      className="relative h-screen w-full bg-[#F5F3EE] flex items-center justify-center overflow-hidden"
     >
-      {/* Background gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#F5F3EE]/80 to-[#F5F3EE]"></div>
+      {/* Massive Background Typography */}
+      <h1 
+        ref={textRef}
+        className="absolute z-10 text-[12vw] font-black text-[#2C2C2C] leading-none text-center whitespace-nowrap mix-blend-difference pointer-events-none"
+        style={{ fontFamily: 'var(--font-heading)' }}
+      >
+        {title}
+      </h1>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-16">
-        {/* Hero Content */}
-        <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
-          {/* Left Content */}
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-left"
+      {/* Center Image/Video that will expand */}
+      <div 
+        ref={videoWrapperRef}
+        className="absolute inset-0 z-0 w-full h-full flex items-center justify-center bg-black"
+        style={{ clipPath: 'circle(10% at 50% 50%)' }}
+      >
+        <img 
+          src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1920&q=80" 
+          alt="Nature Landscape" 
+          className="w-full h-full object-cover opacity-80"
+        />
+        
+        {/* Expanded Content inside the mask */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-4">
+          <p className="text-xl md:text-3xl italic mb-8 mt-40 opacity-90 max-w-2xl text-center font-light">
+            "Satu langkah kecil untuk gaya hidup yang lebih baik."
+          </p>
+          <button 
+            onClick={() => onCtaClick ? onCtaClick() : navigate('/marketplace')}
+            className="magnetic px-8 py-4 bg-white/10 backdrop-blur-md border border-white/30 rounded-full text-white font-medium hover:bg-white hover:text-black transition-colors duration-300"
           >
-            <motion.h1 
-              className="text-6xl md:text-7xl lg:text-8xl font-bold text-[#2C2C2C] mb-4"
-              style={{ fontFamily: 'var(--font-heading)' }}
-            >
-              {title}
-            </motion.h1>
-            <motion.p 
-              className="text-2xl md:text-3xl text-[#8B7355] mb-8 italic"
-              style={{ fontFamily: 'var(--font-heading)' }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-            >
-              {subtitle}
-            </motion.p>
-            <motion.p 
-              className="text-base md:text-lg text-gray-600 mb-8 max-w-lg leading-relaxed"
-              style={{ fontFamily: 'var(--font-body)' }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
-            >
-              Temukan koleksi produk ramah lingkungan yang dirancang untuk menciptakan gaya hidup berkelanjutan. 
-              Dari peralatan rumah tangga hingga produk perawatan, semua dibuat dengan cinta untuk bumi.
-            </motion.p>
-            <motion.button
-              onClick={handleCtaClick}
-              className="group flex items-center gap-3 bg-[#2C2C2C] text-white px-8 py-4 rounded-full font-medium transition-all duration-300 hover:bg-[#1a1a1a] hover:shadow-xl"
-              style={{ fontFamily: 'var(--font-body)' }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
-            >
-              <span>{ctaText}</span>
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </motion.button>
-          </motion.div>
-
-          {/* Right - Featured Products Cards */}
-          <motion.div
-            className="grid grid-cols-2 gap-4"
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          >
-            {featuredProducts.map((product, index) => (
-              <motion.div
-                key={product.id}
-                className={`relative rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer group ${
-                  index === 0 ? 'col-span-2 h-80' : 'h-64'
-                }`}
-                whileHover={{ y: -8 }}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 + index * 0.1 }}
-              >
-                <img 
-                  src={product.image} 
-                  alt={product.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <span className="inline-block bg-white/90 text-gray-800 px-3 py-1 rounded-full text-xs font-medium mb-2">
-                    {product.tag}
-                  </span>
-                  <h3 className="text-white text-xl font-semibold" style={{ fontFamily: 'var(--font-heading)' }}>
-                    {product.name}
-                  </h3>
-                  <button className="mt-2 text-white flex items-center gap-1 text-sm group/btn">
-                    <span>View More</span>
-                    <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
+            Mulai Perjalanan Anda
+          </button>
         </div>
       </div>
-    </motion.section>
+    </section>
   );
 };

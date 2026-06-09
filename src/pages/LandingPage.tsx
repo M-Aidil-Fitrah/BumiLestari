@@ -8,6 +8,8 @@ import { ProductSection } from '../components/container/ProductSection';
 import { AboutSection } from '../components/container/AboutSection';
 import { TestimonialSection } from '../components/container/TestimonialSection';
 import CTASection from '../components/container/CTASection';
+import { SmoothScroll } from '../components/ui/SmoothScroll';
+import { CustomCursor } from '../components/ui/CustomCursor';
 
 export const LandingPage = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -32,51 +34,49 @@ export const LandingPage = () => {
   };
 
   return (
-    <motion.div 
-      className="min-h-screen bg-white"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      {/* Navigation */}
-      <Navbar isScrolled={isScrolled} />
+    <SmoothScroll>
+      <CustomCursor />
+      <motion.div 
+        className="min-h-screen bg-white"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        {/* Navigation */}
+        <Navbar isScrolled={isScrolled} />
 
-      {/* Main Content */}
-      <main>
-        {/* Hero Section */}
-        <Hero 
-          title="BumiLestari"
-          subtitle="untuk kehidupan berkelanjutan Anda"
-          ctaText="Jelajahi Produk"
+        {/* Main Content */}
+        <main>
+          {/* Hero Section */}
+          <Hero 
+            title="BumiLestari"
+            subtitle="untuk kehidupan berkelanjutan Anda"
+            ctaText="Jelajahi Produk"
+          />
+
+          {/* About Section */}
+          <AboutSection />
+
+          {/* Featured Products Section */}
+          <ProductSection />
+
+          {/* Testimonials Section */}
+          <TestimonialSection />
+
+          {/* CTA Section */}
+          <CTASection />
+        </main>
+
+        {/* Footer */}
+        <Footer />
+
+        {/* Scroll to Top Button */}
+        <ScrollToTopButton 
+          isVisible={isScrolled} 
+          onClick={scrollToTop} 
         />
-
-        {/* About Section */}
-        <AboutSection />
-
-        {/* Featured Products Section */}
-        <ProductSection 
-          title="Produk Pilihan"
-          showAll={false}
-          maxProducts={3}
-          categoryFilter="all"
-        />
-
-        {/* Testimonials Section */}
-        <TestimonialSection />
-
-        {/* CTA Section */}
-        <CTASection />
-      </main>
-
-      {/* Footer */}
-      <Footer />
-
-      {/* Scroll to Top Button */}
-      <ScrollToTopButton 
-        isVisible={isScrolled} 
-        onClick={scrollToTop} 
-      />
-    </motion.div>
+      </motion.div>
+    </SmoothScroll>
   );
 };
