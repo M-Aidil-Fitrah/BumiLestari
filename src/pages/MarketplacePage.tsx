@@ -133,7 +133,8 @@ const MarketplacePage: React.FC = () => {
                 <SearchBar
                   onSearch={setSearchTerm}
                   placeholder="Cari produk..."
-                  className="w-full border-b border-gray-300 rounded-none bg-transparent px-0 py-2 focus:ring-0"
+                  className="w-full"
+                  inputClassName="w-full pl-10 pr-4 py-2 border-b border-gray-300 bg-transparent focus:border-[#8B7355] outline-none transition-all placeholder:text-gray-400 text-[#2C2C2C] text-sm"
                 />
               </div>
 
@@ -194,6 +195,7 @@ const MarketplacePage: React.FC = () => {
                 onSearch={setSearchTerm}
                 placeholder="Cari produk..."
                 className="w-full mb-4"
+                inputClassName="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-lg outline-none text-sm"
               />
               <select
                 value={filters.category}

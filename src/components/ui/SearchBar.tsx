@@ -4,12 +4,14 @@ interface SearchBarProps {
   onSearch: (searchTerm: string) => void;
   placeholder?: string;
   className?: string;
+  inputClassName?: string;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ 
   onSearch, 
   placeholder = "Cari produk...", 
-  className = "" 
+  className = "",
+  inputClassName = "w-full pl-12 pr-4 py-3 bg-white border border-[#8B7355]/30 rounded-xl focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] outline-none transition-all duration-300 placeholder:text-gray-400 text-[#2C2C2C] text-sm"
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -33,7 +35,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           value={searchTerm}
           onChange={handleChange}
           placeholder={placeholder}
-          className="w-full pl-12 pr-4 py-3 bg-white border border-[#8B7355]/30 rounded-xl focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] outline-none transition-all duration-300 placeholder:text-gray-400 text-[#2C2C2C] text-sm"
+          className={inputClassName}
         />
         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
           <svg
