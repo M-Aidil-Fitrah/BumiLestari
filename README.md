@@ -7,8 +7,6 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.x-38B2AC.svg?style=flat&logo=tailwind-css)](https://tailwindcss.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-Backend-4ECB71.svg?style=flat&logo=supabase)](https://supabase.com/)
 
-> Platform gaya hidup berkelanjutan dan *e-commerce* premium, dibangun dengan pendekatan antarmuka "Awwwards-style" yang sinematik dan mendalam.
-
 ---
 
 ## Docker Repository
