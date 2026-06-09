@@ -1,7 +1,6 @@
-// src/pages/MarketplacePage.tsx
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { productService } from '@/lib/products';
 import type { Product } from '@/lib/supabase';
 import SearchBar from '../components/ui/SearchBar';
@@ -10,6 +9,7 @@ import ProductCardMarketplace from '../components/ui/ProductCardMarketplace';
 import Pagination from '../components/ui/Pagination';
 import Navbar from '../components/ui/Navbar';
 import { Footer } from '../components/ui/Footer';
+import { CustomCursor } from '../components/ui/CustomCursor';
 
 const MarketplacePage: React.FC = () => {
   const navigate = useNavigate();
@@ -21,10 +21,19 @@ const MarketplacePage: React.FC = () => {
     minPrice: 0,
     maxPrice: 1000000,
     minRating: 0,
-    sortBy: 'name'
+    sortBy: 'newest'
   });
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 12; // Adjusted for a clean 3-column grid
+
+  const categoriesList = [
+    'Semua Kategori', 
+    'Tas Ramah Lingkungan', 
+    'Botol Ramah Lingkungan', 
+    'Pembersih Organik', 
+    'Alat Makan Ramah Lingkungan', 
+    'Perawatan Pribadi Organik'
+  ];
 
   // Load products from database
   useEffect(() => {
@@ -46,38 +55,23 @@ const MarketplacePage: React.FC = () => {
   // Filter and search products
   const filteredProducts = useMemo(() => {
     let filtered = products.filter((product) => {
-      // Search filter
       const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           product.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+                           (product.description && product.description.toLowerCase().includes(searchTerm.toLowerCase()));
 
-      // Category filter (you'll need to join with categories table)
-      const matchesCategory = filters.category === 'Semua Kategori'; // Simplified for now
+      const matchesCategory = filters.category === 'Semua Kategori' || product.category === filters.category;
 
-      // Price filter
-      const matchesPrice = product.price >= filters.minPrice && product.price <= filters.maxPrice;
-
-      // Rating filter
-      const matchesRating = product.rating >= filters.minRating;
-
-      return matchesSearch && matchesCategory && matchesPrice && matchesRating;
+      return matchesSearch && matchesCategory;
     });
 
     // Sort products
     filtered.sort((a, b) => {
       switch (filters.sortBy) {
-        case 'name':
-          return a.name.localeCompare(b.name);
-        case 'price-asc':
-          return a.price - b.price;
-        case 'price-desc':
-          return b.price - a.price;
-        case 'rating':
-          return b.rating - a.rating;
-        case 'newest':
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-        default:
-          return 0;
+        case 'name': return a.name.localeCompare(b.name);
+        case 'price-asc': return a.price - b.price;
+        case 'price-desc': return b.price - a.price;
+        case 'rating': return b.rating - a.rating;
+        case 'newest': return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        default: return 0;
       }
     });
 
@@ -90,7 +84,7 @@ const MarketplacePage: React.FC = () => {
   const currentProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
 
   // Reset to first page when filters change
-  React.useEffect(() => {
+  useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, filters]);
 
@@ -99,258 +93,183 @@ const MarketplacePage: React.FC = () => {
   };
 
   const handlePageChange = (page: number) => {
-    console.log('Pagination clicked! Changing page to:', page);
     setCurrentPage(page);
-    // Scroll to top of products section
-    document.getElementById('products')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F3EE] pt-20 relative overflow-x-hidden">
-      {/* Background Pattern - Behind everything */}
-      <div className="fixed inset-0 opacity-5 pointer-events-none" style={{ zIndex: -1 }}>
-        <div className="absolute top-20 left-10 w-72 h-72 bg-[#8B7355] rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#2C2C2C] rounded-full blur-3xl"></div>
-      </div>
+    <div className="min-h-screen bg-white text-[#2C2C2C] selection:bg-[#8B7355] selection:text-white">
+      <CustomCursor />
+      <Navbar />
 
-      <div className="relative z-50">
-        <Navbar />
-      </div>
-
-      {/* Hero Banner */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-6">
-        <motion.div
+      {/* Main Content Area */}
+      <main className="pt-28 pb-20 max-w-[95vw] mx-auto px-4 md:px-8">
+        
+        {/* Minimalist Header */}
+        <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="relative bg-gradient-to-br from-[#2C2C2C] to-[#3d3d3d] rounded-3xl overflow-hidden shadow-2xl isolate"
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="mb-16 border-b border-gray-200 pb-8"
         >
-          <div className="grid md:grid-cols-2 gap-8 items-center p-8 md:p-12">
-            {/* Left Content */}
-            <div className="text-white z-10">
-              <motion.h1 
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 }}
-                className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4" 
-                style={{ fontFamily: 'var(--font-heading)' }}
-              >
-                Belanja Produk <span className="text-[#8B7355]">Ramah Lingkungan</span>
-              </motion.h1>
-              <motion.p 
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 }}
-                className="text-lg text-gray-300 mb-6" 
-                style={{ fontFamily: 'var(--font-body)' }}
-              >
-                Dapatkan produk organik berkualitas dengan harga terjangkau. Gratis ongkir untuk belanja di atas Rp 200.000
-              </motion.p>
-              <motion.button
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
-                className="bg-[#8B7355] hover:bg-[#7a6349] text-white font-bold py-3 px-8 rounded-xl transition-all duration-300 shadow-lg"
-              >
-                Belanja Sekarang
-              </motion.button>
-            </div>
-            
-            {/* Right Image */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.3 }}
-              className="relative hidden md:block"
-            >
-              <img
-                src="https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=600&h=400&fit=crop"
-                alt="Fresh Vegetables"
-                className="rounded-2xl shadow-2xl"
-              />
-            </motion.div>
-          </div>
-          
-          {/* Decorative Elements */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-[#8B7355]/10 rounded-full blur-3xl pointer-events-none"></div>
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#8B7355]/10 rounded-full blur-3xl pointer-events-none"></div>
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
+            Koleksi Produk.
+          </h1>
+          <p className="text-lg text-gray-500 font-light max-w-2xl">
+            Pilihan kurasi barang-barang berkelanjutan untuk gaya hidup modern. Kualitas terjamin, ramah lingkungan.
+          </p>
         </motion.div>
-      </div>
 
-      {/* All Products Section */}
-      <div id="products" className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 overflow-x-hidden">
-        {/* Header with Search and Sort */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-          <motion.h2
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="text-2xl font-bold text-[#2C2C2C]"
-            style={{ fontFamily: 'var(--font-heading)' }}
-          >
-            Semua Produk
-          </motion.h2>
+        {/* Layout Split: Sidebar & Grid */}
+        <div className="flex flex-col lg:flex-row gap-12 items-start relative">
           
-          <div className="flex items-center gap-4">
-            {/* Search Bar - Compact */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="flex-1 md:w-80"
-            >
-              <SearchBar
+          {/* Sticky Sidebar */}
+          <aside className="w-full lg:w-64 flex-shrink-0 lg:sticky lg:top-32 h-auto lg:h-[calc(100vh-10rem)] overflow-y-auto no-scrollbar hidden md:block">
+            <div className="flex flex-col gap-10">
+              
+              {/* Search */}
+              <div className="space-y-4">
+                <h3 className="text-xs uppercase tracking-widest font-bold text-gray-400">Pencarian</h3>
+                <SearchBar
+                  onSearch={setSearchTerm}
+                  placeholder="Cari produk..."
+                  className="w-full"
+                  inputClassName="w-full pl-10 pr-4 py-2 border-b border-gray-300 bg-transparent focus:border-[#8B7355] outline-none transition-all placeholder:text-gray-400 text-[#2C2C2C] text-sm"
+                />
+              </div>
+
+              {/* Categories */}
+              <div className="space-y-4">
+                <h3 className="text-xs uppercase tracking-widest font-bold text-gray-400">Kategori</h3>
+                <ul className="space-y-3">
+                  {categoriesList.map((cat) => (
+                    <li key={cat}>
+                      <button
+                        onClick={() => setFilters({...filters, category: cat})}
+                        className={`text-sm hover:text-[#8B7355] transition-colors text-left ${
+                          filters.category === cat ? 'font-bold text-[#2C2C2C]' : 'text-gray-500 font-medium'
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Sorting */}
+              <div className="space-y-4">
+                <h3 className="text-xs uppercase tracking-widest font-bold text-gray-400">Urutkan</h3>
+                <select
+                  value={filters.sortBy}
+                  onChange={(e) => setFilters({...filters, sortBy: e.target.value as any})}
+                  className="w-full text-sm py-2 bg-transparent border-b border-gray-300 outline-none text-[#2C2C2C] cursor-pointer"
+                >
+                  <option value="newest">Terbaru</option>
+                  <option value="price-asc">Harga: Rendah ke Tinggi</option>
+                  <option value="price-desc">Harga: Tinggi ke Rendah</option>
+                  <option value="name">Alfabetis (A-Z)</option>
+                  <option value="rating">Rating Tertinggi</option>
+                </select>
+              </div>
+
+              {/* Reset Filter */}
+              {(searchTerm || filters.category !== 'Semua Kategori') && (
+                <button
+                  onClick={() => {
+                    setSearchTerm('');
+                    setFilters({...filters, category: 'Semua Kategori', sortBy: 'newest'});
+                  }}
+                  className="text-xs text-[#8B7355] hover:underline uppercase tracking-widest font-bold mt-4"
+                >
+                  Reset Filter
+                </button>
+              )}
+
+            </div>
+          </aside>
+
+          {/* Mobile Filter Toggle (Hidden on Desktop) */}
+          <div className="w-full lg:hidden block mb-6">
+             <SearchBar
                 onSearch={setSearchTerm}
                 placeholder="Cari produk..."
-                className="w-full"
+                className="w-full mb-4"
+                inputClassName="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-lg outline-none text-sm"
               />
-            </motion.div>
+              <select
+                value={filters.category}
+                onChange={(e) => setFilters({...filters, category: e.target.value})}
+                className="w-full p-3 border border-gray-200 rounded-lg bg-gray-50 mb-4"
+              >
+                 {categoriesList.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+              </select>
+          </div>
+
+          {/* Product Grid Area */}
+          <div className="flex-1 w-full min-h-[50vh]">
             
-            {/* Sort Dropdown */}
-            <motion.select
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              value={filters.sortBy}
-              onChange={(e) => setFilters({...filters, sortBy: e.target.value as any})}
-              className="px-4 py-3 bg-white border border-[#8B7355]/30 rounded-xl focus:ring-2 focus:ring-[#8B7355] focus:border-[#8B7355] outline-none transition-all font-medium text-[#2C2C2C]"
-            >
-              <option value="name">A-Z</option>
-              <option value="price-asc">Termurah</option>
-              <option value="price-desc">Termahal</option>
-              <option value="rating">Rating</option>
-              <option value="newest">Terbaru</option>
-            </motion.select>
-          </div>
-        </div>
-
-        {/* Category Pills - Grid Layout */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6"
-        >
-          {['Semua Kategori', 'Tas Ramah Lingkungan', 'Botol Ramah Lingkungan', 'Pembersih Organik', 'Alat Makan Ramah Lingkungan', 'Perawatan Pribadi Organik'].map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setFilters({...filters, category: cat})}
-              className={`px-4 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 ${
-                filters.category === cat
-                  ? 'bg-[#2C2C2C] text-white shadow-lg'
-                  : 'bg-white text-[#2C2C2C] border border-gray-200 hover:shadow-md'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </motion.div>
-
-        {/* Results Info - Simple */}
-        <div className="flex items-center justify-between mb-6">
-          <p className="text-gray-600 text-sm">
-            <span className="font-bold text-[#2C2C2C]">{filteredProducts.length}</span> produk ditemukan
-          </p>
-          {searchTerm && (
-            <button
-              onClick={() => setSearchTerm('')}
-              className="text-sm text-[#8B7355] hover:text-[#2C2C2C] font-medium transition-colors"
-            >
-              Hapus pencarian
-            </button>
-          )}
-        </div>
-
-        {/* Loading State */}
-        {loading ? (
-          <div className="text-center py-20">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#8B7355] border-t-transparent"></div>
-            <p className="mt-4 text-gray-600">Memuat produk...</p>
-          </div>
-        ) : currentProducts.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center py-20 bg-white/80 backdrop-blur-sm rounded-3xl border border-[#8B7355]/20"
-          >
-            <div className="mb-6">
-              <svg className="mx-auto h-32 w-32 text-[#8B7355]/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-              </svg>
+            <div className="mb-6 text-sm text-gray-500">
+              Menampilkan {currentProducts.length} dari {filteredProducts.length} produk
             </div>
-            <h3 className="text-2xl font-bold text-[#2C2C2C] mb-3" style={{ fontFamily: 'var(--font-heading)' }}>
-              Tidak ada produk ditemukan
-            </h3>
-            <p className="text-gray-600 mb-6 max-w-md mx-auto" style={{ fontFamily: 'var(--font-body)' }}>
-              Coba ubah kriteria pencarian atau filter untuk menemukan produk yang sesuai
-            </p>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => {
-                setSearchTerm('');
-                setFilters({
-                  category: 'Semua Kategori',
-                  minPrice: 0,
-                  maxPrice: 1000000,
-                  minRating: 0,
-                  sortBy: 'name'
-                });
-              }}
-              className="bg-[#2C2C2C] hover:bg-[#1a1a1a] text-white font-semibold py-3 px-8 rounded-xl transition-all duration-300 shadow-lg inline-flex items-center gap-2"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              Reset Semua Filter
-            </motion.button>
-          </motion.div>
-        ) : (
-          <>
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={{
-                hidden: {},
-                visible: {
-                  transition: {
-                    staggerChildren: 0.05
-                  }
-                }
-              }}
-              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 mb-8"
-            >
-              {currentProducts.map((product) => (
-                <motion.div
-                  key={product.id}
-                  variants={{
-                    hidden: { opacity: 0, y: 20 },
-                    visible: { opacity: 1, y: 0 }
-                  }}
+
+            {loading ? (
+              <div className="w-full h-64 flex flex-col items-center justify-center gap-4">
+                <div className="w-8 h-8 border-2 border-[#2C2C2C] border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-sm font-medium tracking-widest uppercase">Memuat...</p>
+              </div>
+            ) : currentProducts.length === 0 ? (
+              <motion.div 
+                initial={{ opacity: 0 }} 
+                animate={{ opacity: 1 }} 
+                className="w-full h-64 flex flex-col items-center justify-center text-center border border-dashed border-gray-300 rounded-lg"
+              >
+                <h3 className="text-xl font-bold mb-2">Tidak Ditemukan</h3>
+                <p className="text-gray-500">Koleksi yang Anda cari sedang tidak tersedia saat ini.</p>
+              </motion.div>
+            ) : (
+              <>
+                <motion.div 
+                  layout
+                  className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-16"
                 >
-                  <ProductCardMarketplace
-                    product={product}
-                    onClick={handleProductClick}
-                  />
+                  <AnimatePresence>
+                    {currentProducts.map((product, i) => (
+                      <motion.div
+                        key={product.id}
+                        layout
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        transition={{ duration: 0.5, delay: i * 0.05 }}
+                      >
+                        <ProductCardMarketplace
+                          product={product}
+                          onClick={handleProductClick}
+                        />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
                 </motion.div>
-              ))}
-            </motion.div>
 
-            {/* Pagination */}
-            <div className="relative z-30 mt-8">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                totalItems={filteredProducts.length}
-                itemsPerPage={itemsPerPage}
-                onPageChange={handlePageChange}
-              />
-            </div>
-          </>
-        )}
-      </div>
+                {totalPages > 1 && (
+                  <div className="mt-20 border-t border-gray-100 pt-10">
+                    <Pagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      totalItems={filteredProducts.length}
+                      itemsPerPage={itemsPerPage}
+                      onPageChange={handlePageChange}
+                    />
+                  </div>
+                )}
+              </>
+            )}
+
+          </div>
+
+        </div>
+      </main>
 
       <Footer />
     </div>
