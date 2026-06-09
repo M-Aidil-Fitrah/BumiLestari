@@ -120,7 +120,7 @@ export const Footer: React.FC = () => {
             className="text-gray-500 text-sm"
             style={{ fontFamily: 'var(--font-body)' }}
           >
-            © 2025 BumiLestari. Hak cipta dilindungi.
+            © 2026 BumiLestari. Hak cipta dilindungi.
           </p>
           <div className="flex gap-8 mt-4 md:mt-0">
             <a 
