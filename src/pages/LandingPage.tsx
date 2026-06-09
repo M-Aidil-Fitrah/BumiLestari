@@ -9,6 +9,7 @@ import { AboutSection } from '../components/container/AboutSection';
 import { TestimonialSection } from '../components/container/TestimonialSection';
 import CTASection from '../components/container/CTASection';
 import { SmoothScroll } from '../components/ui/SmoothScroll';
+import { CustomCursor } from '../components/ui/CustomCursor';
 
 export const LandingPage = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -34,6 +35,7 @@ export const LandingPage = () => {
 
   return (
     <SmoothScroll>
+      <CustomCursor />
       <motion.div 
         className="min-h-screen bg-white"
         initial={{ opacity: 0 }}
@@ -57,12 +59,7 @@ export const LandingPage = () => {
           <AboutSection />
 
           {/* Featured Products Section */}
-          <ProductSection 
-            title="Produk Pilihan"
-            showAll={false}
-            maxProducts={3}
-            categoryFilter="all"
-          />
+          <ProductSection />
 
           {/* Testimonials Section */}
           <TestimonialSection />

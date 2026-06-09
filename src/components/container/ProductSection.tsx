@@ -1,34 +1,20 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Product } from '@/lib/supabase';
-import { ArrowRight, Star, ShoppingBag } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
-import { TextReveal } from '../ui/TextReveal';
-import { MagneticButton } from '../ui/MagneticButton';
 
-interface ProductSectionProps {
-  title?: string;
-  showAll?: boolean;
-  maxProducts?: number;
-  categoryFilter?: string;
-}
-
-export const ProductSection = ({
-  title = "Produk",
-  maxProducts = 3,
-}: ProductSectionProps) => {
+export const ProductSection = () => {
   const navigate = useNavigate();
   const sectionRef = useRef<HTMLElement>(null);
-
-  // Mock data for display purposes
+  
   const [featuredProducts] = useState<Partial<Product>[]>([
     {
       id: '1',
       name: 'Set Botol Minum Bambu',
       category: 'Lifestyle',
       price: 150000,
-      rating: 4.8,
       image: '/images/bambueco.jpeg'
     },
     {
@@ -36,7 +22,6 @@ export const ProductSection = ({
       name: 'Diffuser Aromaterapi',
       category: 'Home',
       price: 250000,
-      rating: 4.9,
       image: '/images/diffuser.jpg'
     },
     {
@@ -44,7 +29,6 @@ export const ProductSection = ({
       name: 'Lilin Kedelai Organik',
       category: 'Home',
       price: 85000,
-      rating: 4.7,
       image: '/images/lilin.jpg'
     }
   ]);
@@ -52,135 +36,112 @@ export const ProductSection = ({
   useGSAP(() => {
     if (!sectionRef.current) return;
 
-    gsap.fromTo('.product-header-btn',
-      { opacity: 0, x: 50 },
-      { 
-        opacity: 1, x: 0, duration: 1, ease: 'power3.out',
-        scrollTrigger: {
-          trigger: '.product-header-btn',
-          start: 'top 90%',
-        }
-      }
-    );
+    // Fast scroll skew effect
+    let proxy = { skew: 0 },
+        skewSetter = gsap.quickSetter(".product-skew-item", "skewY", "deg"), // fast
+        clamp = gsap.utils.clamp(-20, 20); // don't let the skew go beyond 20 degrees. 
 
-    gsap.fromTo('.product-card',
-      { opacity: 0, y: 50, scale: 0.95 },
-      {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.8,
-        stagger: 0.15,
-        ease: 'back.out(1.2)',
-        scrollTrigger: {
-          trigger: '.product-grid',
-          start: 'top 85%',
+    gsap.to(".product-skew-item", {
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: "top bottom",
+        end: "bottom top",
+        onUpdate: (self) => {
+          let skew = clamp(self.getVelocity() / -300);
+          // only do something if the skew is MORE severe. Remember, we're always tweening back to 0
+          if (Math.abs(skew) > Math.abs(proxy.skew)) {
+            proxy.skew = skew;
+            gsap.to(proxy, {skew: 0, duration: 0.8, ease: "power3", overwrite: true, onUpdate: () => skewSetter(proxy.skew)});
+          }
         }
       }
-    );
+    });
+
+    // Parallax entrance for products
+    const items = gsap.utils.toArray<HTMLElement>('.product-item-container');
+    items.forEach((item, i) => {
+      // Different speed for odd/even to enhance asymmetric feel
+      const speed = i % 2 === 0 ? 100 : 200;
+      gsap.fromTo(item, 
+        { y: speed, opacity: 0 },
+        { 
+          y: 0, 
+          opacity: 1, 
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: item,
+            start: "top 85%",
+            end: "top 50%",
+            scrub: 1
+          }
+        }
+      );
+    });
 
   }, { scope: sectionRef });
 
-  const handleProductClick = (product: Partial<Product>) => {
-    navigate(`/marketplace/product/${product.id}`);
-  };
-
   return (
-    <section ref={sectionRef} className="py-20 bg-[#1a1a1a] relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0" style={{
-          backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)',
-          backgroundSize: '40px 40px'
-        }}></div>
-      </div>
-
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="flex items-center justify-between mb-12">
-          <h2 className="text-5xl md:text-6xl font-bold text-white overflow-hidden" style={{ fontFamily: 'var(--font-heading)' }}>
-            <TextReveal>{title}</TextReveal>
+    <section ref={sectionRef} className="py-32 bg-[#F5F3EE] relative overflow-hidden">
+      <div className="max-w-[90vw] mx-auto">
+        
+        {/* Header Asymmetric */}
+        <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-24 gap-8">
+          <h2 className="text-6xl md:text-8xl font-bold text-[#2C2C2C] max-w-3xl leading-tight" style={{ fontFamily: 'var(--font-heading)' }}>
+            Elegance <br/> <span className="italic text-[#8B7355] font-light">& Sustainability</span>
           </h2>
-          <div className="product-header-btn">
-            <MagneticButton
-              onClick={() => navigate('/marketplace')}
-              className="flex items-center gap-2 bg-white text-gray-900 px-6 py-3 rounded-full font-medium transition-colors hover:bg-gray-200"
-              style={{ fontFamily: 'var(--font-body)' }}
-              magneticForce={0.2}
-            >
-              <span>Lihat Semua</span>
-              <ArrowRight className="w-5 h-5" />
-            </MagneticButton>
-          </div>
+          <button
+            onClick={() => navigate('/marketplace')}
+            className="magnetic flex items-center gap-4 bg-transparent border border-[#2C2C2C] text-[#2C2C2C] px-8 py-4 rounded-full font-medium hover:bg-[#2C2C2C] hover:text-white transition-all duration-300"
+          >
+            <span>Koleksi Lengkap</span>
+            <ArrowRight className="w-5 h-5" />
+          </button>
         </div>
 
-        {/* Products Grid */}
-        <div className="product-grid grid grid-cols-1 md:grid-cols-3 gap-6">
-          {featuredProducts.slice(0, maxProducts).map((product, index) => (
-            <div
-              key={product.id}
-              className="product-card group cursor-pointer"
-              onClick={() => handleProductClick(product)}
+        {/* Asymmetric Grid */}
+        <div className="flex flex-col gap-32">
+          {featuredProducts.map((product, index) => (
+            <div 
+              key={product.id} 
+              className={`product-item-container w-full flex ${index % 2 !== 0 ? 'justify-end' : 'justify-start'}`}
             >
-              {/* Product Card */}
-              <div className="relative overflow-hidden rounded-3xl bg-white shadow-lg hover:shadow-2xl transition-all duration-500 transform group-hover:-translate-y-2">
-                {/* Badge */}
-                {index === 0 && (
-                  <div className="absolute top-4 left-4 z-10 bg-[#D4AF37] text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">
-                    TERLARIS
+              <div 
+                className="w-full md:w-[45vw] group cursor-pointer"
+                onClick={() => navigate(`/marketplace/product/${product.id}`)}
+              >
+                {/* Skew Container */}
+                <div className="product-skew-item origin-center">
+                  <div className="relative overflow-hidden aspect-[4/5] rounded-none mb-6">
+                    <img 
+                      src={product.image || ''} 
+                      alt={product.name}
+                      className="w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-1000 ease-out"
+                    />
+                    
+                    {/* Floating Hover Text */}
+                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
+                      <span className="text-white text-lg tracking-widest uppercase border border-white/50 px-6 py-2 rounded-full backdrop-blur-sm">View</span>
+                    </div>
                   </div>
-                )}
-                
-                {/* Image */}
-                <div className="relative h-80 overflow-hidden">
-                  <img 
-                    src={product.image || ''} 
-                    alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </div>
-
-                {/* Content */}
-                <div className="p-6">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <h3 
-                        className="text-xl font-bold text-gray-900 mb-1 group-hover:text-[#8B7355] transition-colors duration-300"
-                        style={{ fontFamily: 'var(--font-heading)' }}
-                      >
+                  
+                  {/* Product Details outside card */}
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-sm text-gray-500 uppercase tracking-widest mb-2">{product.category}</p>
+                      <h3 className="text-2xl md:text-3xl font-bold text-[#2C2C2C] mb-2" style={{ fontFamily: 'var(--font-heading)' }}>
                         {product.name}
                       </h3>
-                      <p 
-                        className="text-sm text-gray-500"
-                        style={{ fontFamily: 'var(--font-body)' }}
-                      >
-                        {product.category}
-                      </p>
                     </div>
-                    <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-lg">
-                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                      <span className="text-sm font-bold text-gray-700">{product.rating}</span>
-                    </div>
-                  </div>
-
-                  {/* Price */}
-                  <div className="flex items-center justify-between mt-4">
-                    <span 
-                      className="text-2xl font-bold text-gray-900"
-                      style={{ fontFamily: 'var(--font-body)' }}
-                    >
+                    <span className="text-xl font-medium text-[#8B7355]">
                       Rp {product.price?.toLocaleString('id-ID')}
                     </span>
-                    <button className="flex items-center justify-center w-12 h-12 bg-gray-900 text-white rounded-full group-hover:bg-[#8B7355] transition-all duration-300 group-hover:scale-110 shadow-md">
-                      <ShoppingBag className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-                    </button>
                   </div>
                 </div>
               </div>
             </div>
           ))}
         </div>
+
       </div>
     </section>
   );
