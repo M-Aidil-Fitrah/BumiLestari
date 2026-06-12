@@ -70,7 +70,11 @@ export const orderService = {
       .update({ status, updated_at: new Date().toISOString() })
       .eq('id', orderId);
 
-    if (error) throw new Error(error.message);
+    if (error) {
+      // Log clearly so RLS or network issues are visible
+      console.error('updateOrderStatus error:', error.message, '| orderId:', orderId);
+      throw new Error(error.message);
+    }
   },
 
   async createCheckoutAndGetSnapToken(items: CheckoutItem[], totalAmount: number): Promise<{ token: string; orderId: string }> {
