@@ -95,8 +95,12 @@ const AddProductModal = ({ onClose, onSuccess }: AddProductModalProps) => {
       image: formData.image,
     });
     onSuccess();
-  } catch (error: any) {
-    alert('Gagal menambahkan produk: ' + error.message);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      alert('Gagal menambahkan produk: ' + error.message);
+    } else {
+      alert('Gagal menambahkan produk.');
+    }
   } finally {
     setLoading(false);
   }
@@ -280,7 +284,7 @@ const AddProductModal = ({ onClose, onSuccess }: AddProductModalProps) => {
                                             onClick={() => setFormData({ ...formData, badge: badge.id })}
                                             className={`px-3 py-1.5 text-xs font-bold rounded-full border transition-all ${
                                                 formData.badge === badge.id 
-                                                ? badge.id === '' ? 'bg-gray-800 text-white border-gray-800 shadow-sm' : `${badge.color} ring-2 ring-offset-2 ring-${badge.color.split('-')[1]}-400 shadow-sm`
+                                                ? badge.id === '' ? 'bg-gray-800 text-white border-gray-800 shadow-sm' : `${badge.color!} ring-2 ring-offset-2 ring-${badge.color!.split('-')[1]}-400 shadow-sm`
                                                 : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-100'
                                             }`}
                                         >
