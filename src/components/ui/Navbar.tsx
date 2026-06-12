@@ -55,6 +55,13 @@ export const Navbar: React.FC<NavbarProps> = ({ isScrolled }) => {
         ...baseItems,
       ];
 
+      // Tambah menu Pesanan Saya
+      loggedInItems.push({
+        label: 'Pesanan Saya',
+        ariaLabel: 'Lihat status dan riwayat pesanan Anda',
+        link: '/orders'
+      });
+
       // Tambah menu Admin jika user adalah admin
       if (isAdmin) {
         loggedInItems.push({

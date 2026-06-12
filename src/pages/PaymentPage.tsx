@@ -2,10 +2,27 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { productService } from '@/lib/products';
+import { orderService } from '@/lib/orders';
 import PaymentMethod from '../components/ui/PaymentMethod';
 import OrderSummary, { type OrderItem } from '../components/ui/OrderSummary';
 import PaymentForm, { type CustomerData } from '../components/ui/PaymentForm';
 import PaymentSuccessModal from '../components/ui/PaymentSuccessModal';
+
+interface SnapCallbacks {
+  onSuccess: () => void;
+  onPending: () => void;
+  onError: () => void;
+  onClose: () => void;
+}
+interface SnapInstance {
+  pay: (token: string, callbacks: SnapCallbacks) => void;
+}
+
+declare global {
+  interface Window {
+    snap?: SnapInstance;
+  }
+}
 
 const PaymentPage: React.FC = () => {
   const navigate = useNavigate();
@@ -96,24 +113,56 @@ const PaymentPage: React.FC = () => {
   };
 
   // Handle payment submission
-  const handlePayment = () => {
+  const handlePayment = async () => {
     if (!isFormValid()) {
       alert('Mohon lengkapi semua data yang diperlukan');
       return;
     }
 
-    // TODO: Integrate with backend to save order
-    // Example:
-    // await orderService.createOrder({
-    //   items: orderItems,
-    //   customerData,
-    //   paymentMethod: selectedPaymentMethod,
-    //   shippingCost: 0,
-    //   paymentFee: getPaymentFee()
-    // });
+    try {
+      setIsLoading(true);
+      const totalAmount = orderItems.reduce((sum, item) => sum + (item.product.price * item.quantity), 0) + getPaymentFee();
+      
+      const checkoutItems = orderItems.map(item => ({
+        product_id: item.product.id,
+        quantity: item.quantity,
+        price: item.product.price,
+        name: item.product.name
+      }));
 
-    // Simulate payment processing
-    setShowSuccessModal(true);
+      const { token, orderId } = await orderService.createCheckoutAndGetSnapToken(checkoutItems, totalAmount);
+      
+      if (typeof window !== 'undefined' && window.snap) {
+        window.snap.pay(token, {
+          onSuccess: async function() {
+            // Directly update status in Supabase (webhook can't reach localhost)
+            await orderService.updateOrderStatus(orderId, 'success');
+            setShowSuccessModal(true);
+          },
+          onPending: function() {
+            navigate('/orders');
+          },
+          onError: async function() {
+            await orderService.updateOrderStatus(orderId, 'failed');
+            navigate('/orders');
+          },
+          onClose: function() {
+            navigate('/orders');
+          }
+        });
+      } else {
+        alert('Sistem pembayaran gagal dimuat.');
+        navigate('/orders');
+      }
+    } catch (err) {
+      const error = err as Error;
+      alert(error.message);
+      if (error.message.includes('logged in')) {
+        navigate('/login');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleModalClose = () => {

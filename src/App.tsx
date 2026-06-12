@@ -9,6 +9,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import LogoutPage from './pages/LogoutPage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
 import TestLokiSimple from './pages/TestLokiSimple';
+import OrdersPage from './pages/OrdersPage';
 
 
 
@@ -27,9 +28,10 @@ function App() {
         <Route path="/payment" element={<PaymentPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/logout" element={<LogoutPage />} />
-              <Route path="/change-password" element={<ChangePasswordPage />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/logout" element={<LogoutPage />} />
+        <Route path="/change-password" element={<ChangePasswordPage />} />
+        <Route path="/orders" element={<OrdersPage />} />
 
 
 
