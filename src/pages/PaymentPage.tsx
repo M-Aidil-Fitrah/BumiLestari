@@ -6,29 +6,6 @@ import { productService } from '@/lib/products';
 import { orderService } from '@/lib/orders';
 import type { Product } from '@/lib/supabase';
 
-interface SnapCallbacks {
-  onSuccess: (result: SnapResult) => void;
-  onPending: (result: SnapResult) => void;
-  onError: (result: SnapResult) => void;
-  onClose: () => void;
-}
-
-interface SnapResult {
-  order_id: string;
-  payment_type?: string;
-  transaction_status?: string;
-}
-
-interface SnapInstance {
-  pay: (token: string, callbacks: SnapCallbacks) => void;
-}
-
-declare global {
-  interface Window {
-    snap?: SnapInstance;
-  }
-}
-
 interface CartItem {
   product: Product;
   quantity: number;
@@ -88,7 +65,7 @@ const PaymentPage: React.FC = () => {
     setErrorMsg('');
 
     try {
-      const { token, orderId } = await orderService.createCheckoutAndGetSnapToken(
+      const { token } = await orderService.createCheckoutAndGetSnapToken(
         [{
           product_id: cartItem.product.id,
           quantity: cartItem.quantity,

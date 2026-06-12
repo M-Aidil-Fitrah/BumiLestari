@@ -7,23 +7,6 @@ import type { Order } from '@/lib/supabase';
 import Navbar from '@/components/ui/Navbar';
 import Footer from '@/components/ui/Footer';
 
-interface SnapCallbacks {
-  onSuccess: () => void;
-  onPending: () => void;
-  onError: () => void;
-  onClose: () => void;
-}
-
-interface SnapInstance {
-  pay: (token: string, callbacks: SnapCallbacks) => void;
-}
-
-declare global {
-  interface Window {
-    snap?: SnapInstance;
-  }
-}
-
 const OrdersPage = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
