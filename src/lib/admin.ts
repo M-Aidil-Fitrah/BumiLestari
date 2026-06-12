@@ -1,6 +1,6 @@
 // src/lib/admin.ts
 import { supabase } from './supabase';
-import type { Product } from './supabase';
+import type { Product, Profile } from './supabase';
 
 export const adminService = {
   // Check if current user is admin
@@ -160,5 +160,20 @@ export const adminService = {
 
     if (error) throw error;
     return data;
+  },
+
+  // Get all customers (users)
+  async getCustomers(): Promise<Profile[]> {
+    const isAdmin = await this.isAdmin();
+    if (!isAdmin) throw new Error('Unauthorized: Admin access required');
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('role', 'user')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
   },
 };
