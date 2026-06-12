@@ -4,11 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, Edit2, Trash2, ArrowLeft, Package, AlertCircle, Star, LayoutDashboard, Users, Leaf, Mail, Phone, Calendar } from 'lucide-react';
 import { adminService } from '@/lib/admin';
 import { productService } from '@/lib/products';
-import type { Product, Profile } from '@/lib/supabase';
+import { orderService } from '@/lib/orders';
+import type { Product, Profile, Order } from '@/lib/supabase';
 import AddProductModal from '@/components/admin/AddProductModal';
 import EditProductModal from '@/components/admin/EditProductModal';
 
-type Tab = 'dashboard' | 'pelanggan';
+type Tab = 'dashboard' | 'pelanggan' | 'pesanan';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -17,10 +18,12 @@ const AdminDashboard = () => {
   // Data States
   const [products, setProducts] = useState<Product[]>([]);
   const [customers, setCustomers] = useState<Profile[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   
   // Loading States
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [loadingCustomers, setLoadingCustomers] = useState(false);
+  const [loadingOrders, setLoadingOrders] = useState(false);
   
   // Admin State
   const [isAdmin, setIsAdmin] = useState(false);
@@ -40,6 +43,8 @@ const AdminDashboard = () => {
         loadProducts();
       } else if (activeTab === 'pelanggan') {
         loadCustomers();
+      } else if (activeTab === 'pesanan') {
+        loadOrders();
       }
     }
   }, [isAdmin, activeTab]);
@@ -83,6 +88,18 @@ const AdminDashboard = () => {
     }
   };
 
+  const loadOrders = async () => {
+    setLoadingOrders(true);
+    try {
+      const data = await orderService.getAllOrders();
+      setOrders(data);
+    } catch (error) {
+      console.error('Error loading orders:', error);
+    } finally {
+      setLoadingOrders(false);
+    }
+  };
+
   const handleDelete = async (productId: string) => {
     if (!confirm('Yakin ingin menghapus produk ini?')) return;
 
@@ -95,6 +112,19 @@ const AdminDashboard = () => {
         alert('Gagal menghapus produk: ' + error.message);
       } else {
         alert('Gagal menghapus produk.');
+      }
+    }
+  };
+
+  const handleUpdateOrderStatus = async (orderId: string, newStatus: 'success' | 'failed' | 'pending') => {
+    try {
+      await orderService.updateOrderStatus(orderId, newStatus);
+      loadOrders();
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        alert('Gagal update status: ' + error.message);
+      } else {
+        alert('Gagal update status.');
       }
     }
   };
@@ -333,6 +363,95 @@ const AdminDashboard = () => {
     </div>
   );
 
+  const renderPesananTab = () => (
+    <div className="animate-in fade-in duration-500">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+        <div className="p-6 border-b border-gray-100 bg-gray-50/50">
+          <h2 className="text-lg font-bold text-[#2C2C2C]">Daftar Pesanan</h2>
+          <p className="text-sm text-gray-500">Pantau transaksi dan pesanan dari pelanggan.</p>
+        </div>
+
+        {loadingOrders ? (
+          <div className="p-16 flex flex-col items-center justify-center">
+            <div className="w-10 h-10 border-4 border-[#8B7355] border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p className="text-gray-500 font-medium">Memuat data pesanan...</p>
+          </div>
+        ) : orders.length === 0 ? (
+          <div className="p-16 text-center">
+            <div className="w-24 h-24 bg-[#F5F3EE] rounded-full flex items-center justify-center mx-auto mb-4 border border-[#8B7355]/20">
+              <Package className="w-10 h-10 text-[#8B7355]" />
+            </div>
+            <h3 className="text-xl font-bold text-[#2C2C2C] mb-2">Belum Ada Pesanan</h3>
+            <p className="text-gray-500">Saat ini belum ada transaksi yang tercatat.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse whitespace-nowrap">
+              <thead>
+                <tr className="bg-white">
+                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">ID Pesanan</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">Pelanggan</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">Tanggal</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">Total</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">Status</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">Aksi Admin</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {orders.map((order) => (
+                  <tr key={order.id} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="px-6 py-4 text-sm font-mono text-[#2C2C2C]">
+                      {order.id.substring(0, 8).toUpperCase()}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="font-semibold text-[#2C2C2C]">{order.profiles?.full_name || 'Pelanggan'}</div>
+                      <div className="text-xs text-gray-500">{order.profiles?.phone || '-'}</div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">
+                      {new Date(order.created_at).toLocaleDateString('id-ID')}
+                    </td>
+                    <td className="px-6 py-4 font-semibold text-[#2C2C2C]">
+                      {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(order.total_amount)}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${
+                        order.status === 'success' ? 'bg-green-50 text-green-700 border-green-200' :
+                        order.status === 'pending' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                        'bg-red-50 text-red-700 border-red-200'
+                      }`}>
+                        {order.status.toUpperCase()}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex gap-2">
+                        {order.status !== 'success' && (
+                          <button
+                            onClick={() => handleUpdateOrderStatus(order.id, 'success')}
+                            className="px-2.5 py-1 text-xs font-medium rounded-lg bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 transition-colors"
+                          >
+                            ✓ Sukses
+                          </button>
+                        )}
+                        {order.status !== 'failed' && (
+                          <button
+                            onClick={() => handleUpdateOrderStatus(order.id, 'failed')}
+                            className="px-2.5 py-1 text-xs font-medium rounded-lg bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition-colors"
+                          >
+                            ✗ Gagal
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-[#F5F3EE] flex">
       {/* Sidebar */}
@@ -357,6 +476,18 @@ const AdminDashboard = () => {
             Produk
           </button>
           
+          <button 
+            onClick={() => setActiveTab('pesanan')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
+              activeTab === 'pesanan' 
+              ? 'bg-[#2C2C2C] text-white shadow-md' 
+              : 'text-gray-600 hover:bg-gray-50 hover:text-[#2C2C2C]'
+            }`}
+          >
+            <Package className={`w-5 h-5 ${activeTab === 'pesanan' ? 'text-white' : 'text-gray-400'}`} />
+            Pesanan
+          </button>
+
           <button 
             onClick={() => setActiveTab('pelanggan')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
@@ -386,10 +517,12 @@ const AdminDashboard = () => {
         <header className="bg-white px-8 py-6 border-b border-gray-200 flex justify-between items-center z-10 shrink-0">
           <div>
             <h1 className="text-2xl font-bold text-[#2C2C2C]">
-              {activeTab === 'dashboard' ? 'Katalog Produk' : 'Manajemen Pelanggan'}
+              {activeTab === 'dashboard' ? 'Katalog Produk' : 
+               activeTab === 'pesanan' ? 'Daftar Pesanan' : 'Manajemen Pelanggan'}
             </h1>
             <p className="text-sm text-gray-500 mt-1">
-              {activeTab === 'dashboard' ? 'Ringkasan performa dan inventaris.' : 'Daftar pengguna terdaftar.'}
+              {activeTab === 'dashboard' ? 'Ringkasan performa dan inventaris.' : 
+               activeTab === 'pesanan' ? 'Pantau transaksi yang masuk.' : 'Daftar pengguna terdaftar.'}
             </p>
           </div>
           <div className="flex items-center gap-4">
@@ -400,7 +533,8 @@ const AdminDashboard = () => {
         </header>
 
         <div className="flex-1 overflow-auto p-8 custom-scrollbar">
-          {activeTab === 'dashboard' ? renderDashboardTab() : renderPelangganTab()}
+          {activeTab === 'dashboard' ? renderDashboardTab() : 
+           activeTab === 'pesanan' ? renderPesananTab() : renderPelangganTab()}
         </div>
       </main>
 

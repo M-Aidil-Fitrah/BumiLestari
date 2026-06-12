@@ -66,3 +66,29 @@ export interface Category {
   image_url: string | null;
   created_at: string;
 }
+
+export interface Order {
+  id: string;
+  user_id: string;
+  total_amount: number;
+  status: 'pending' | 'success' | 'failed' | 'expired';
+  snap_token: string | null;
+  created_at: string;
+  updated_at: string;
+  profiles?: {
+    full_name: string | null;
+    phone: string | null;
+  } | null;
+}
+
+export interface OrderItem {
+  id: string;
+  order_id: string;
+  product_id: string;
+  quantity: number;
+  price: number;
+  products?: {
+    name: string;
+    image: string | null;
+  } | null;
+}
